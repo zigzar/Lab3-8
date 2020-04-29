@@ -77,6 +77,12 @@ float stackPop(Stack<T>* stack)
 	return data;
 }
 
+template<typename T>
+float stackGet(Stack<T>* stack)
+{
+	return stack->head->data;
+}
+
 void agreement()
 {
 	int answer;

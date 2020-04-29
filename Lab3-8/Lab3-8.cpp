@@ -129,33 +129,33 @@ float calcPN(string ex, bool isRev)
 int parse(Stack* stack, string s)
 {
 	float tval = 0;
-			
+
 	if (s[s.length() - 1] == '-') {										// Распознавание знаков арифметических операций
-		if (stack->head->next != nullptr) {
+		if (stack->head != nullptr && stack->head->next != nullptr) {
 			return(SUB);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '+') {
-		if (stack->head->next != nullptr) {
+		if (stack->head != nullptr && stack->head->next != nullptr) {
 			return(ADD);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '*') {
-		if (stack->head->next != nullptr) {
+		if (stack->head != nullptr && stack->head->next != nullptr) {
 			return(MUL);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '/') {
-		if (stack->head->next != nullptr) {
-			return(DIV);
+		if (stack->head != nullptr && stack->head->next != nullptr) {
+			return(DIV);+ 
 		}
 		else return(SUF);
 	}
 
-																	// Попытка сконвертировать строковый аргумент в число
+	// Попытка сконвертировать строковый аргумент в число
 	try
 	{
 		tval = stof(s);

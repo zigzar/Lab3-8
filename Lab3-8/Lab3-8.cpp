@@ -41,6 +41,8 @@ template<typename T>
 void stackPush(Stack<T>* stack, float data);					// Добавить элемент в стак
 template<typename T>
 float stackPop(Stack<T>* stack);								// Удалить элемент из стака
+template<typename T>
+float stackGet(Stack<T>* stack);								// Получить элемент из стака
 float calcPN(string ex, bool isRev);
 template<typename T>
 int parse(Stack<T>* stack, string s);

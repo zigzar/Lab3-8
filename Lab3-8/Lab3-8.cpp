@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <conio.h>
 
 using namespace std;
 
@@ -23,20 +24,23 @@ using namespace std;
 template<typename T>
 struct Node														// Узел стака
 {
-	T data;													// Данные
+	T data;														// Данные
 	Node* next;													// Адрес следующего узла
 };
 
 template<typename T>
 struct Stack													// Стак
 {
-	Node<T>* head = nullptr;										// Первый элемент стака
+	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
+void agreement();
+int getAnsAgreement();
+
 template<typename T>
-void stackPush(Stack<T>* stack, float data);						// Добавить элемент в стак
+void stackPush(Stack<T>* stack, float data);					// Добавить элемент в стак
 template<typename T>
-float stackPop(Stack<T>* stack);									// Удалить элемент из стака
+float stackPop(Stack<T>* stack);								// Удалить элемент из стака
 float calcPN(string ex, bool isRev);
 template<typename T>
 int parse(Stack<T>* stack, string s);
@@ -44,12 +48,14 @@ int parse(Stack<T>* stack, string s);
 int main()
 {
 	setlocale(LC_ALL, "russian");
+	agreement();
 	string ex;
 	cout << "Введите выражение и нажмите Enter:" << endl;
 	getline(cin, ex);
 	cout << calcPN(ex, false) << endl;
 	system("pause");
 }
+
 template<typename T>
 void stackPush(Stack<T>* stack, float data)
 {
@@ -58,6 +64,7 @@ void stackPush(Stack<T>* stack, float data)
 	node->next = stack->head;
 	stack->head = node;
 }
+
 template<typename T>
 float stackPop(Stack<T>* stack)
 {
@@ -68,6 +75,60 @@ float stackPop(Stack<T>* stack)
 
 	delete temp;
 	return data;
+}
+
+void agreement()
+{
+	int answer;
+	bool showLockedMenu = false;
+	answer = getAnsAgreement();
+	switch (answer)
+	{
+	case 0:
+		return;
+		break;
+	case 1:
+		exit(0);
+		break;
+	}
+}
+
+int getAnsAgreement()
+{
+	int choice = 0;
+	int options = 2;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Пользовательское соглашение." << endl
+			<< "Выбирая «принять», вы обязуетесь соблюдать следующие условия использования программы:" << endl
+			<< "1 все бинарные операторы, скобки и операнды разделять пробелами (пример: ( 2 + 2 ) * 2 )" << endl
+			<< "2 вводить унарный минус слитно (пример: 2 * ( -1 ); 2 -1 * )" << endl << endl;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		if (choice == 0) cout << "-> Принять" << endl;
+		else  cout << "   Принять" << endl;
+
+		if (choice == 1) cout << "-> Отклонить" << endl;
+		else  cout << "   Отклонить" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
 }
 
 float calcPN(string ex, bool isRev)

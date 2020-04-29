@@ -29,7 +29,6 @@ struct Node														// Узел стака
 struct Stack													// Стак
 {
 	Node* head = nullptr;										// Первый элемент стака
-	int scount = 0;												// Количество элементов в стаке
 };
 
 void stackPush(Stack* stack, float data);						// Добавить элемент в стак
@@ -132,29 +131,25 @@ int parse(Stack* stack, string s)
 	float tval = 0;
 			
 	if (s[s.length() - 1] == '-') {										// Распознавание знаков арифметических операций
-		if (stack->scount >= 2) {
-			stack->scount -= 1;
+		if (stack->head->next != nullptr) {
 			return(SUB);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '+') {
-		if (stack->scount >= 2) {
-			stack->scount -= 1;
+		if (stack->head->next != nullptr) {
 			return(ADD);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '*') {
-		if (stack->scount >= 2) {
-			stack->scount -= 1;
+		if (stack->head->next != nullptr) {
 			return(MUL);
 		}
 		else return(SUF);
 	}
 	if (s[s.length() - 1] == '/') {
-		if (stack->scount >= 2) {
-			stack->scount -= 1;
+		if (stack->head->next != nullptr) {
 			return(DIV);
 		}
 		else return(SUF);
@@ -171,7 +166,6 @@ int parse(Stack* stack, string s)
 	}
 
 	stackPush(stack, tval);											// Сохранить число в стак
-	stack->scount++;
 
 	return(VAL);
 }

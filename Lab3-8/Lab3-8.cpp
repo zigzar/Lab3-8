@@ -68,7 +68,7 @@ void stackPush(Stack<T>* stack, float data)
 template<typename T>
 float stackPop(Stack<T>* stack)
 {
-	float data = stack->head->data;
+	T data = stack->head->data;
 	Node<T>* temp = stack->head;
 
 	stack->head = stack->head->next;

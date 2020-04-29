@@ -90,27 +90,28 @@ float calcRPN(Stack* stack, string ex)
 			stackPush(stack, stackPop(stack) - temp);
 			break;
 
-		//case MUL:
-		//	stack[stack->scount - 1] *= stack[stack->scount];
-		//	break;
+		case MUL:
+			stackPush(stack, stackPop(stack) + stackPop(stack));
+			break;
 
-		//case DIV:
-		//	if (stack[stack->scount] != 0) {
-		//		stack[stack->scount - 1] /= stack[stack->scount];
-		//		break;
-		//	}
-		//	else {
-		//		fprintf(stderr, "Деление на ноль!\n");
-		//		return(1);
-		//	}
+		case DIV:
+			temp = stackPop(stack);
+			if (temp != 0) {
+				stackPush(stack, stackPop(stack) / temp);
+				break;
+			}
+			else {
+				cerr << "Деление на ноль!" << endl;
+				return(1);
+			}
 
 			/* Обработка ошибок */
 		case SUF:
-			fprintf(stderr, "Недостаточно операндов!\n");
+			cerr << "Недостаточно операндов!" << endl;
 			return(1);
 
 		case UNK:
-			fprintf(stderr, "Неопознанный аргумент!\n");
+			cerr << "Неопознанный аргумент!" << endl;
 			return(1);
 		}
 	}

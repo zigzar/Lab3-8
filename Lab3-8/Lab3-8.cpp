@@ -91,7 +91,7 @@ float calcRPN(Stack* stack, string ex)
 			break;
 
 		case MUL:
-			stackPush(stack, stackPop(stack) + stackPop(stack));
+			stackPush(stack, stackPop(stack) * stackPop(stack));
 			break;
 
 		case DIV:

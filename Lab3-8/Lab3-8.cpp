@@ -34,17 +34,16 @@ struct Stack													// Стак
 
 void stackPush(Stack* stack, float data);						// Добавить элемент в стак
 float stackPop(Stack* stack);									// Удалить элемент из стака
-float calcRPN(Stack* stack, string ex);
+float calcPN(string ex, bool isRev);
 int parse(Stack* stack, string s);
 
 int main()
 {
 	setlocale(LC_ALL, "russian");
-	Stack stack;
 	string ex;
 	cout << "Введите выражение и нажмите Enter:" << endl;
 	getline(cin, ex);
-	cout << calcRPN(&stack, ex) << endl;
+	cout << calcPN(ex, false) << endl;
 	system("pause");
 }
 
@@ -67,8 +66,10 @@ float stackPop(Stack* stack)
 	return data;
 }
 
-float calcRPN(Stack* stack, string ex)
+float calcPN(string ex, bool isRev)
 {
+	if (!isRev) reverse(ex.begin(), ex.end());
+	Stack stack;
 	string token;
 	stringstream bufStream;
 	bufStream << ex;
@@ -78,26 +79,34 @@ float calcRPN(Stack* stack, string ex)
 	{
 		/* Пытаемся распознать текущий аргумент как число или
 		 * символ арифметической операции */
-		switch (parse(stack, token)) {
+		switch (parse(&stack, token)) {
 		case VAL: continue;
 
 			/* Вычисляем */
 		case ADD:
-			stackPush(stack, stackPop(stack) + stackPop(stack));
+			stackPush(&stack, stackPop(&stack) + stackPop(&stack));
 			break;
+
 		case SUB:
-			temp = stackPop(stack);
-			stackPush(stack, stackPop(stack) - temp);
+			if (isRev)
+			{
+				temp = stackPop(&stack);
+				stackPush(&stack, stackPop(&stack) - temp);
+			}
+			else
+			{
+				stackPush(&stack, stackPop(&stack) - stackPop(&stack));
+			}
 			break;
 
 		case MUL:
-			stackPush(stack, stackPop(stack) * stackPop(stack));
+			stackPush(&stack, stackPop(&stack) * stackPop(&stack));
 			break;
 
 		case DIV:
-			temp = stackPop(stack);
+			temp = stackPop(&stack);
 			if (temp != 0) {
-				stackPush(stack, stackPop(stack) / temp);
+				stackPush(&stack, stackPop(&stack) / temp);
 				break;
 			}
 			else {
@@ -115,7 +124,7 @@ float calcRPN(Stack* stack, string ex)
 			return(1);
 		}
 	}
-	return stack->head->data;
+	return stack.head->data;
 }
 
 int parse(Stack* stack, string s)

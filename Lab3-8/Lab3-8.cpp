@@ -20,21 +20,26 @@ using namespace std;
 #define SUF -1													// В стеке недостаточно операндов
 #define UNK -2													// Неопознанное значение
 
+template<typename T>
 struct Node														// Узел стака
 {
-	float data;													// Данные
+	T data;													// Данные
 	Node* next;													// Адрес следующего узла
 };
 
+template<typename T>
 struct Stack													// Стак
 {
-	Node* head = nullptr;										// Первый элемент стака
+	Node<T>* head = nullptr;										// Первый элемент стака
 };
 
-void stackPush(Stack* stack, float data);						// Добавить элемент в стак
-float stackPop(Stack* stack);									// Удалить элемент из стака
+template<typename T>
+void stackPush(Stack<T>* stack, float data);						// Добавить элемент в стак
+template<typename T>
+float stackPop(Stack<T>* stack);									// Удалить элемент из стака
 float calcPN(string ex, bool isRev);
-int parse(Stack* stack, string s);
+template<typename T>
+int parse(Stack<T>* stack, string s);
 
 int main()
 {
@@ -45,19 +50,19 @@ int main()
 	cout << calcPN(ex, false) << endl;
 	system("pause");
 }
-
-void stackPush(Stack* stack, float data)
+template<typename T>
+void stackPush(Stack<T>* stack, float data)
 {
-	Node* node = new Node;
+	Node<T>* node = new Node<T>;
 	node->data = data;
 	node->next = stack->head;
 	stack->head = node;
 }
-
-float stackPop(Stack* stack)
+template<typename T>
+float stackPop(Stack<T>* stack)
 {
 	float data = stack->head->data;
-	Node* temp = stack->head;
+	Node<T>* temp = stack->head;
 
 	stack->head = stack->head->next;
 
@@ -68,7 +73,7 @@ float stackPop(Stack* stack)
 float calcPN(string ex, bool isRev)
 {
 	if (!isRev) reverse(ex.begin(), ex.end());
-	Stack stack;
+	Stack<float> stack;
 	string token;
 	stringstream bufStream;
 	bufStream << ex;
@@ -125,8 +130,8 @@ float calcPN(string ex, bool isRev)
 	}
 	return stack.head->data;
 }
-
-int parse(Stack* stack, string s)
+template<typename T>
+int parse(Stack<T>* stack, string s)
 {
 	float tval = 0;
 
@@ -150,7 +155,7 @@ int parse(Stack* stack, string s)
 	}
 	if (s[s.length() - 1] == '/') {
 		if (stack->head != nullptr && stack->head->next != nullptr) {
-			return(DIV);+ 
+			return(DIV);
 		}
 		else return(SUF);
 	}

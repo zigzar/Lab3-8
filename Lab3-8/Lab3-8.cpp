@@ -37,14 +37,19 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
+void RPNMenu(string& ex);
+void PNMenu(string& ex);
+void infixMenu(string& ex);
 void transMenu();
+bool inpMenu(string& ex);
 void calcMenu();
 void menu();
 void agreement();
 
+int getAnsRPN();
+int getAnsPN();
+int getAnsInf();
 int getAnsNot();
-int getAnsTrans();
-int getAnsCalc();
 int getAnsMenu();
 int getAnsAgreement();
 

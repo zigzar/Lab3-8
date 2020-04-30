@@ -1,4 +1,4 @@
-﻿//TODO: Меню, ввод с клавиатуры, ввод с файла, проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
+﻿//TODO: Проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
 //TODO? Сделать массивами, сравнить скорость, infix -> PN, infix -> RPN, PN -> infix, PN -> RPN, RPN -> infix, RPN -> PN
 
 // Пользовательское соглашение.
@@ -382,15 +382,27 @@ float calcPN(string ex, bool isRev)
 			break;
 
 		case DIV:
-			temp = stackPop(&stack);
-			if (temp != 0) {
-				stackPush(&stack, stackPop(&stack) / temp);
-				break;
+			try
+			{
+				if (isRev)
+				{
+					temp = stackPop(&stack);
+					stackPush(&stack, stackPop(&stack) / temp);
+					break;
+				}
+				else
+				{
+					stackPush(&stack, stackPop(&stack) / stackPop(&stack));
+				}
 			}
-			else {
-				cerr << "Деление на ноль!" << endl;
-				return(1);
+			catch (const std::exception&)
+			{
+				cerr << "Деление на ноль запрещено!" << endl;
+				return(NULL);
 			}
+
+			break;
+
 
 			/* Обработка ошибок */
 		case SUF:

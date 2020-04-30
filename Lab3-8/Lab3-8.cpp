@@ -37,11 +37,13 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
+void transMenu();
 void calcMenu();
 void menu();
 void agreement();
 
 int getAnsNot();
+int getAnsTrans();
 int getAnsCalc();
 int getAnsMenu();
 int getAnsAgreement();
@@ -114,12 +116,83 @@ void file(string& ex)
 	fin.close();
 }
 
-void calcMenu()
+void RPNMenu(string& ex)
 {
-	int answer;
-	string ex;
+	int answer = getAnsRPN();
+	switch (answer)
+	{
+	case 0:
+		//RPNToInfix(ex);
+		break;
+	case 1:
+		//RPNToPN(ex);
+		break;
+	case 2:
+		return;
+		break;
+	}
+}
 
-	answer = getAnsCalc();
+void PNMenu(string& ex)
+{
+	int answer = getAnsPN();
+	switch (answer)
+	{
+	case 0:
+		//PNToInfix(ex);
+		break;
+	case 1:
+		//PNToRPN(ex);
+		break;
+	case 2:
+		return;
+		break;
+	}
+}
+
+void infixMenu(string& ex)
+{
+	int answer = getAnsInf();
+	switch (answer)
+	{
+	case 0:
+		//infixToPN(ex);
+		break;
+	case 1:
+		//infixToRPN(ex);
+		break;
+	case 2:
+		return;
+		break;
+	}
+}
+
+void transMenu()
+{
+	string ex;
+	if (inpMenu(ex)) return;		// Если выбрано "Назад", выйти из меню перевода
+
+	int answer = getAnsNot();
+		switch (answer)
+		{
+		case 0:
+			infixMenu(ex);
+			break;
+		case 1:
+			PNMenu(ex);
+			break;
+		case 2:
+			RPNMenu(ex);
+			break;
+		case 3:
+			return;
+			break;
+		}
+}
+
+bool inpMenu(string& ex)
+{
+	int answer = getAnsInp();
 	switch (answer)
 	{
 	case 0:
@@ -129,13 +202,21 @@ void calcMenu()
 		file(ex);
 		break;
 	case 2:
-		return;
+		return true;				// Выбрано назад
 		break;
 	}
+	return false;					// Выбран ввод выражения
+}
+
+void calcMenu()
+{
+	string ex;
+
+	if (inpMenu(ex)) return;		// Если выбрано "Назад", выйти из меню вычисления
 
 	float result;
 
-	answer = getAnsNot();
+	int answer = getAnsNot();
 	switch (answer)
 	{
 	case 0:
@@ -146,6 +227,9 @@ void calcMenu()
 		break;
 	case 2:
 		result = calcPN(ex, true);
+		break;
+	case 3:
+		return;
 		break;
 	}
 
@@ -163,12 +247,15 @@ void menu()
 			calcMenu();
 			break; 
 		case 1:
+			transMenu();
+			break;		
+		case 2:
 			//genTest();
 			break;
-		case 2:
+		case 3:
 			//task();
 			break;
-		case 3:
+		case 4:
 			exit(0);
 			break;
 		}
@@ -191,10 +278,124 @@ void agreement()
 	}
 }
 
-int getAnsNot()
+int getAnsRPN()
 {
 	int choice = 0;
 	int options = 3;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		cout << "Выберите нотацию конечного выражения:" << endl << endl;
+
+		if (choice == 0) cout << "-> Инфиксная (нормальная)" << endl;
+		else  cout << "   Инфиксная (нормальная)" << endl;
+
+		if (choice == 1) cout << "-> Прямая польская" << endl;
+		else  cout << "   Прямая польская" << endl;
+
+		if (choice == 2) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
+int getAnsPN()
+{
+	int choice = 0;
+	int options = 3;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		cout << "Выберите нотацию конечного выражения:" << endl << endl;
+
+		if (choice == 0) cout << "-> Инфиксная (нормальная)" << endl;
+		else  cout << "   Инфиксная (нормальная)" << endl;
+
+		if (choice == 1) cout << "-> Обратная польская" << endl;
+		else  cout << "   Обратная польская" << endl;
+
+		if (choice == 2) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
+int getAnsInf()
+{
+	int choice = 0;
+	int options = 3;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		cout << "Выберите нотацию конечного выражения:" << endl << endl;
+
+		if (choice == 0) cout << "-> Прямая польская" << endl;
+		else  cout << "   Прямая польская" << endl;
+
+		if (choice == 1) cout << "-> Обратная польская" << endl;
+		else  cout << "   Обратная польская" << endl;
+
+		if (choice == 2) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
+int getAnsNot()
+{
+	int choice = 0;
+	int options = 4;
 	int ch;
 	while (true) {
 		system("cls");
@@ -214,6 +415,9 @@ int getAnsNot()
 		if (choice == 2) cout << "-> Обратная польская" << endl;
 		else  cout << "   Обратная польская" << endl;
 
+		if (choice == 3) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
 		ch = _getch();
 		if (ch == 224)
 		{
@@ -229,7 +433,7 @@ int getAnsNot()
 	return choice;
 }
 
-int getAnsCalc()
+int getAnsInp()
 {
 	int choice = 0;
 	int options = 3;
@@ -270,7 +474,7 @@ int getAnsCalc()
 int getAnsMenu()
 {
 	int choice = 0;
-	int options = 4;
+	int options = 5;
 	int ch;
 	while (true) {
 		system("cls");
@@ -282,13 +486,16 @@ int getAnsMenu()
 		if (choice == 0) cout << "-> Вычислить выражение" << endl;
 		else  cout << "   Вычислить выражение" << endl;
 
-		if (choice == 1) cout << "-> Сгенерировать тест" << endl;
+		if (choice == 1) cout << "-> Преобразовать выражение" << endl;
+		else  cout << "   Преобразовать выражение" << endl;
+
+		if (choice == 2) cout << "-> Сгенерировать тест" << endl;
 		else  cout << "   Сгенерировать тест" << endl;
 
-		if (choice == 2) cout << "-> Задание по варианту" << endl;
+		if (choice == 3) cout << "-> Задание по варианту" << endl;
 		else  cout << "   Задание по варианту" << endl;
 
-		if (choice == 3) cout << "-> Выход" << endl;
+		if (choice == 4) cout << "-> Выход" << endl;
 		else  cout << "   Выход" << endl;
 
 		ch = _getch();

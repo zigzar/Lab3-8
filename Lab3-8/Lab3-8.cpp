@@ -388,7 +388,6 @@ float calcPN(string ex, bool isRev)
 				{
 					temp = stackPop(&stack);
 					stackPush(&stack, stackPop(&stack) / temp);
-					break;
 				}
 				else
 				{
@@ -400,7 +399,6 @@ float calcPN(string ex, bool isRev)
 				cerr << "Деление на ноль запрещено!" << endl;
 				return(NULL);
 			}
-
 			break;
 
 

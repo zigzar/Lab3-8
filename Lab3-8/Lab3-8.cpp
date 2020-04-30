@@ -1,4 +1,4 @@
-﻿//TODO: Проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
+﻿//TODO: Первичное создание файла, проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
 //TODO? Сделать массивами, сравнить скорость, infix -> PN, infix -> RPN, PN -> infix, PN -> RPN, RPN -> infix, RPN -> PN
 
 // Пользовательское соглашение.
@@ -37,15 +37,16 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
-void RPNMenu(string& ex);
-void PNMenu(string& ex);
-void infixMenu(string& ex);
+bool RPNMenu(string& ex);
+bool PNMenu(string& ex);
+bool infixMenu(string& ex);
 void transMenu();
 bool inpMenu(string& ex);
 void calcMenu();
 void menu();
 void agreement();
 
+int getAnsInp();
 int getAnsRPN();
 int getAnsPN();
 int getAnsInf();
@@ -53,10 +54,10 @@ int getAnsNot();
 int getAnsMenu();
 int getAnsAgreement();
 
+template<typename T, typename N>
+void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
 template<typename T>
-void stackPush(Stack<T>* stack, float data);					// Добавить элемент в стак
-template<typename T>
-float stackPop(Stack<T>* stack);								// Удалить элемент из стака
+T stackPop(Stack<T>* stack);								// Удалить элемент из стака
 template<typename T>
 float stackGet(Stack<T>* stack);								// Получить элемент из стака
 float calcPN(string ex, bool isRev);
@@ -71,17 +72,17 @@ int main()
 	system("pause");
 }
 
-template<typename T>
-void stackPush(Stack<T>* stack, float data)
+template<typename T, typename N>
+void stackPush(Stack<T>* stack, N data)
 {
-	Node<T>* node = new Node<T>;
+	Node<N>* node = new Node<N>;
 	node->data = data;
 	node->next = stack->head;
 	stack->head = node;
 }
 
 template<typename T>
-float stackPop(Stack<T>* stack)
+T stackPop(Stack<T>* stack)
 {
 	T data = stack->head->data;
 	Node<T>* temp = stack->head;
@@ -121,41 +122,117 @@ void file(string& ex)
 	fin.close();
 }
 
-void RPNMenu(string& ex)
+void PNToInfix(string& ex, bool isRev)
+{
+	if (!isRev) reverse(ex.begin(), ex.end());
+	Stack<string> stack;
+	string token, buffer, temp;
+	stringstream bufStream, stackStream;
+	bufStream << ex;
+	cin.clear();
+	while (getline(bufStream, token, ' '))
+	{
+		/* Пытаемся распознать текущий аргумент как число или
+		 * символ арифметической операции */
+		switch (parse(&stack, token)) {
+		case VAL: continue;
+
+			/* Вычисляем */
+		case ADD:
+			stackStream << "(" << stackPop(&stack) << " + " << stackPop(&stack) << ")";
+			stackStream >> buffer;
+			stackPush(&stack, buffer);
+			break;
+
+		case SUB:
+			if (isRev)
+			{
+				temp = stackPop(&stack);
+				stackStream << "(" << stackPop(&stack) << " - " << temp << ")";
+				stackStream >> buffer;
+				stackPush(&stack, buffer);
+			}
+			else
+			{
+				stackStream << "(" << stackPop(&stack) << " - " << stackPop(&stack) << ")";
+				stackStream >> buffer;
+				stackPush(&stack, buffer);
+			}
+			break;
+
+		case MUL:
+			stackStream << stackPop(&stack) << " * " << stackPop(&stack);
+			stackStream >> buffer;
+			stackPush(&stack, buffer);
+			break;
+
+		case DIV:
+			if (isRev)
+			{
+				temp = stackPop(&stack);
+				stackStream << stackPop(&stack) << " - " << temp;
+				stackStream >> buffer;
+				stackPush(&stack, buffer);
+			}
+			else
+			{
+				stackStream << stackPop(&stack) << " - " << stackPop(&stack);
+				stackStream >> buffer;
+				stackPush(&stack, buffer);
+			}
+			break;
+
+
+			/* Обработка ошибок */
+		case SUF:
+			cerr << "Недостаточно операндов!" << endl;
+			return;
+
+		case UNK:
+			cerr << "Неопознанный аргумент!" << endl;
+			return;
+		}
+	}
+	ex = stack.head->data;
+}
+
+bool RPNMenu(string& ex)
 {
 	int answer = getAnsRPN();
 	switch (answer)
 	{
 	case 0:
-		//RPNToInfix(ex);
+		PNToInfix(ex, true);
 		break;
 	case 1:
-		//RPNToPN(ex);
+		reverse(ex.begin(), ex.end());
 		break;
 	case 2:
-		return;
+		return true;
 		break;
 	}
+	return false;
 }
 
-void PNMenu(string& ex)
+bool PNMenu(string& ex)
 {
 	int answer = getAnsPN();
 	switch (answer)
 	{
 	case 0:
-		//PNToInfix(ex);
+		PNToInfix(ex, false);
 		break;
 	case 1:
-		//PNToRPN(ex);
+		reverse(ex.begin(), ex.end());
 		break;
 	case 2:
-		return;
+		return true;
 		break;
 	}
+	return false;
 }
 
-void infixMenu(string& ex)
+bool infixMenu(string& ex)
 {
 	int answer = getAnsInf();
 	switch (answer)
@@ -167,9 +244,10 @@ void infixMenu(string& ex)
 		//infixToRPN(ex);
 		break;
 	case 2:
-		return;
+		return true;
 		break;
 	}
+	return false;
 }
 
 void transMenu()
@@ -177,22 +255,30 @@ void transMenu()
 	string ex;
 	if (inpMenu(ex)) return;		// Если выбрано "Назад", выйти из меню перевода
 
-	int answer = getAnsNot();
+	int answer;
+	while (true)
+	{
+		answer = getAnsNot();
 		switch (answer)
 		{
 		case 0:
-			infixMenu(ex);
+			if (infixMenu(ex)) continue;
 			break;
 		case 1:
-			PNMenu(ex);
+			if (PNMenu(ex)) continue;
 			break;
 		case 2:
-			RPNMenu(ex);
+			if (RPNMenu(ex)) continue;
 			break;
 		case 3:
 			return;
 			break;
 		}
+		break;
+	}
+		cout << "Преобразованное выражение:" << endl
+			<< ex << endl;
+		system("pause");
 }
 
 bool inpMenu(string& ex)
@@ -629,7 +715,7 @@ float calcPN(string ex, bool isRev)
 template<typename T>
 int parse(Stack<T>* stack, string s)
 {
-	float tval = 0;
+	T tval;																// Временное значение того же типа, что и стак
 
 	if (s[s.length() - 1] == '-') {										// Распознавание знаков арифметических операций
 		if (stack->head != nullptr && stack->head->next != nullptr) {
@@ -656,17 +742,23 @@ int parse(Stack<T>* stack, string s)
 		else return(SUF);
 	}
 
-	// Попытка сконвертировать строковый аргумент в число
-	try
+	
+	if (sizeof(tval) == sizeof(float) || sizeof(tval) == sizeof(float))	// Если работаем с числовым стаком
 	{
-		tval = stof(s);
+		try																// Попытаться сконвертировать строковый аргумент в число
+		{
+			tval = stof(s);
+		}
+		catch (const std::exception&)
+		{
+			return(UNK);
+		}
+		stackPush(stack, tval);		// Сохранить число в стак
 	}
-	catch (const std::exception&)
+	else
 	{
-		return(UNK);
+		stackPush(stack, s);
 	}
-
-	stackPush(stack, tval);											// Сохранить число в стак
 
 	return(VAL);
 }

@@ -1,4 +1,4 @@
-﻿//TODO: Меню, ввод с клавиатуры, ввод с файла, парсинг строки, проверка на корректность, вычисление, проверочная работа, посчитать скорость, задание по варианту
+﻿//TODO: Меню, ввод с клавиатуры, ввод с файла, проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
 //TODO? Сделать массивами, сравнить скорость, infix -> PN, infix -> RPN, PN -> infix, PN -> RPN, RPN -> infix, RPN -> PN
 
 // Пользовательское соглашение.
@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <conio.h>
 
 using namespace std;
@@ -20,6 +21,8 @@ using namespace std;
 #define DIV  4													// Деление
 #define SUF -1													// В стеке недостаточно операндов
 #define UNK -2													// Неопознанное значение
+
+#define inpFile "input.txt"										// Файл ввода
 
 template<typename T>
 struct Node														// Узел стака
@@ -34,7 +37,13 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
+void calcMenu();
+void menu();
 void agreement();
+
+int getAnsNot();
+int getAnsCalc();
+int getAnsMenu();
 int getAnsAgreement();
 
 template<typename T>
@@ -51,10 +60,7 @@ int main()
 {
 	setlocale(LC_ALL, "russian");
 	agreement();
-	string ex;
-	cout << "Введите выражение и нажмите Enter:" << endl;
-	getline(cin, ex);
-	cout << calcPN(ex, false) << endl;
+	menu();
 	system("pause");
 }
 
@@ -85,10 +91,94 @@ float stackGet(Stack<T>* stack)
 	return stack->head->data;
 }
 
+void console(string& ex)
+{
+	cout << "Введите выражение и нажмите Enter:" << endl;
+	getline(cin, ex);
+}
+
+void file(string& ex)
+{
+	ifstream fin;
+	fin.open(inpFile);
+	if (!fin.is_open())
+	{
+		cout << "Файл ввода не существует. Будет создан новый файл.";
+		fin.close();
+		ofstream fout;
+		fout.open(inpFile);
+		fout.close();
+		return;
+	}
+	getline(fin, ex);
+	fin.close();
+}
+
+void calcMenu()
+{
+	int answer;
+	string ex;
+
+	answer = getAnsCalc();
+	switch (answer)
+	{
+	case 0:
+		console(ex);
+		break;
+	case 1:
+		file(ex);
+		break;
+	case 2:
+		return;
+		break;
+	}
+
+	float result;
+
+	answer = getAnsNot();
+	switch (answer)
+	{
+	case 0:
+		//result = calcInfix(ex);
+		break;
+	case 1:
+		result = calcPN(ex, false);
+		break;
+	case 2:
+		result = calcPN(ex, true);
+		break;
+	}
+
+}
+
+void menu()
+{
+	int answer;
+	while (true)
+	{
+		answer = getAnsMenu();
+		switch (answer)
+		{
+		case 0:
+			calcMenu();
+			break; 
+		case 1:
+			//genTest();
+			break;
+		case 2:
+			//task();
+			break;
+		case 3:
+			exit(0);
+			break;
+		}
+	}
+
+}
+
 void agreement()
 {
 	int answer;
-	bool showLockedMenu = false;
 	answer = getAnsAgreement();
 	switch (answer)
 	{
@@ -99,6 +189,121 @@ void agreement()
 		exit(0);
 		break;
 	}
+}
+
+int getAnsNot()
+{
+	int choice = 0;
+	int options = 3;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		cout << "Выберите нотацию выражения:" << endl << endl;
+
+		if (choice == 0) cout << "-> Инфиксная (нормальная)" << endl;
+		else  cout << "   Инфиксная (нормальная)" << endl;
+
+		if (choice == 1) cout << "-> Прямая польская" << endl;
+		else  cout << "   Прямая польская" << endl;
+
+		if (choice == 2) cout << "-> Обратная польская" << endl;
+		else  cout << "   Обратная польская" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
+int getAnsCalc()
+{
+	int choice = 0;
+	int options = 3;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+		
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		cout << "Выберите способ ввода выражения:" << endl << endl;
+
+		if (choice == 0) cout << "-> Ввести в консоль" << endl;
+		else  cout << "   Ввести в консоль" << endl;
+
+		if (choice == 1) cout << "-> Прочитать из файла" << endl;
+		else  cout << "   Прочитать из файла" << endl;
+
+		if (choice == 2) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
+int getAnsMenu()
+{
+	int choice = 0;
+	int options = 4;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		if (choice == 0) cout << "-> Вычислить выражение" << endl;
+		else  cout << "   Вычислить выражение" << endl;
+
+		if (choice == 1) cout << "-> Сгенерировать тест" << endl;
+		else  cout << "   Сгенерировать тест" << endl;
+
+		if (choice == 2) cout << "-> Задание по варианту" << endl;
+		else  cout << "   Задание по варианту" << endl;
+
+		if (choice == 3) cout << "-> Выход" << endl;
+		else  cout << "   Выход" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
 }
 
 int getAnsAgreement()

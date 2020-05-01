@@ -1,4 +1,4 @@
-﻿//TODO: Первичное создание файла, проверочная работа, посчитать скорость
+﻿//TODO: Проверочная работа, посчитать скорость
 //TODO? Сделать массивами, сравнить скорость
 //BUG: выражение 3 / ( -3 ) + 2 - 1 * 13 неверно обрабатывается
 
@@ -73,6 +73,7 @@ int main()
 	setlocale(LC_ALL, "russian");
 	srand(time(NULL));
 	agreement();
+	newFile();
 	menu();
 	system("pause");
 }
@@ -96,6 +97,23 @@ T stackPop(Stack<T>* stack)
 
 	delete temp;
 	return data;
+}
+
+
+void newFile()
+{
+	ifstream fin;
+	fin.open(inpFile);
+	if (!fin.is_open())
+	{
+		cout << "Файл ввода не существует. Будет создан новый файл.";
+		fin.close();
+		ofstream fout;
+		fout.open(inpFile);
+		fout.close();
+		return;
+	}
+	fin.close();
 }
 
 void console(string& ex)

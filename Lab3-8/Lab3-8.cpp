@@ -15,10 +15,10 @@
 using namespace std;
 
 #define VAL  0													// В стек занесено новое значение
-#define ADD  1													// Сложение
-#define SUB  2													// Вычитание
-#define MUL  3													// Умножение
-#define DIV  4													// Деление
+#define ADD  11													// Сложение (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define SUB  12													// Вычитание (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define MUL  23													// Умножение (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define DIV  24													// Деление (первая цифра отвечает за приоритет, а вторая - за номер операции)
 #define BRO 5													// Открывающая скобка
 #define BRC 6													// Закрывающая скобка
 #define SUF -1													// В стеке недостаточно операндов
@@ -61,10 +61,9 @@ void stackPush(Stack<T>* stack, N data);					// Добавить элемент 
 template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
 template<typename T>
-float stackCheck(Stack<T>* stack);								// Получить элемент из стака
+int stackCheck(Stack<T>* stack);								// Получить элемент из стака
 float calcPN(string ex, bool isRev);
-template<typename T>
-int parse(Stack<T>* stack, string s);
+int parse(string s);
 
 int main()
 {
@@ -98,7 +97,7 @@ T stackPop(Stack<T>* stack)
 template<typename T>
 int stackCheck(Stack<T>* stack)
 {
-	int token = parse(stack, to_string(stack->head->data));
+	int token = parse(stack->head->data);
 	return token;
 }
 
@@ -137,7 +136,7 @@ void PNToInfix(string& ex, bool isRev)
 	{
 		/* Пытаемся распознать текущий аргумент как число или
 		 * символ арифметической операции */
-		switch (parse(&stack, token)) {
+		switch (parse(token)) {
 		case VAL: 
 			stackPush(&stack, token);
 			break;
@@ -250,99 +249,55 @@ void infixToPN(string& ex, bool isRev)
 	while (getline(bufStream, token, ' '))
 	{
 		// Попытка опознать токен
-		switch (parse(&stack, token)) {
+		int tokenType = parse(token);
+		switch (tokenType) {
 		case VAL:
 			ex += token;
 			ex += " ";
 			break;
 
-		// Вычисление
 		case ADD:
-			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
-				temp1 = stackPop(&stack);
-				temp2 = stackPop(&stack);
-				buffer = "( + )";
-				buffer.insert(1, temp1);
-				buffer.insert(buffer.length() - 1, temp2);
-				stackPush(&stack, buffer);
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return;
-			}
-			break;
-
 		case SUB:
-			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
-				if (isRev)
-				{
-					temp1 = stackPop(&stack);
-					temp2 = stackPop(&stack);
-					buffer = "( - )";
-					buffer.insert(1, temp2);
-					buffer.insert(buffer.length() - 1, temp1);
-					stackPush(&stack, buffer);
-				}
-				else
-				{
-					temp1 = stackPop(&stack);
-					temp2 = stackPop(&stack);
-					buffer = "( - )";
-					buffer.insert(1, temp1);
-					buffer.insert(buffer.length() - 1, temp2);
-					stackPush(&stack, buffer);
-				}
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return;
-			}
-			break;
-
 		case MUL:
-			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
-				temp1 = stackPop(&stack);
-				temp2 = stackPop(&stack);
-				buffer = " * ";
-				buffer.insert(0, temp1);
-				buffer.insert(buffer.length(), temp2);
-				stackPush(&stack, buffer);
+		case DIV:
+			try
+			{	
+				if (stack.head != nullptr)
+				{
+					while (parse(stack.head->data) / 10 >= tokenType)	// Пока приоритет оператора на вершине стака >= текущего оператора
+					{
+						ex += stackPop(&stack);
+						ex += " ";
+					}
+				}
+				stackPush(&stack, token);
+
 			}
-			else
+			catch (const std::exception&)
 			{
 				cerr << "Недостаточно операндов!" << endl;
 				return;
 			}
 			break;
 
-		case DIV:
-			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
-				if (isRev)
-				{
-					temp1 = stackPop(&stack);
-					temp2 = stackPop(&stack);
-					buffer = " / ";
-					buffer.insert(0, temp2);
-					buffer.insert(buffer.length(), temp1);
-					stackPush(&stack, buffer);
-				}
-				else
-				{
-					temp1 = stackPop(&stack);
-					temp2 = stackPop(&stack);
-					buffer = " / ";
-					buffer.insert(0, temp1);
-					buffer.insert(buffer.length(), temp2);
-					stackPush(&stack, buffer);
-				}
-			}
-			else
+		case BRO:
+			stackPush(&stack, token);
+			break;
+
+		case BRC:
+			while (parse(stack.head->data) != BRO)				// Пока токен на вершине стека не является открывающей скобкой			
 			{
-				cerr << "Недостаточно операндов!" << endl;
-				return;
+				ex += stackPop(&stack);
+				ex += " ";
+
+				if (stack.head == nullptr)
+				{
+					cerr << "В выражении пропущена скобка" << endl;
+					return;
+				};
 			}
+			stackPop(&stack);									// Выкинуть открывающую скобку из стака
+
 			break;
 
 		case UNK:
@@ -350,7 +305,17 @@ void infixToPN(string& ex, bool isRev)
 			return;
 		}
 	}
-	ex = stack.head->data;
+	while (stack.head != nullptr)
+	{
+		int tokenType = parse(stack.head->data);
+		if (tokenType == BRO || tokenType == BRC)
+		{
+			cerr << "В выражении присутствует незакрытая скобка!" << endl;
+			return;
+		}
+		ex += stackPop(&stack);
+		ex += " ";
+	}
 }
 
 bool RPNMenu(string& ex)
@@ -398,7 +363,7 @@ bool infixMenu(string& ex)
 		//infixToPN(ex);
 		break;
 	case 1:
-		//infixToRPN(ex);
+		infixToPN(ex, true);
 		break;
 	case 2:
 		return true;
@@ -813,7 +778,7 @@ float calcPN(string ex, bool isRev)
 	{
 		/* Пытаемся распознать текущий аргумент как число или
 		 * символ арифметической операции */
-		switch (parse(&stack, token)) {
+		switch (parse(token)) {
 		case VAL: 
 			stackPush(&stack, stof(token));
 			break;
@@ -895,10 +860,9 @@ float calcPN(string ex, bool isRev)
 	return stack.head->data;
 }
 
-template<typename T>
-int parse(Stack<T>* stack, string s)
+int parse(string s)
 {
-	T tval;																// Временное значение того же типа, что и стак
+	float tval;																// Временное значение того же типа, что и стак
 																		// Распознавание знаков арифметических операций
 	if (s[s.length() - 1] == '-') {										// Если последний символ строки - минус (проверка на бинарный минус)
 			return(SUB);

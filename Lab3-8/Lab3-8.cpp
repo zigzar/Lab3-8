@@ -13,6 +13,7 @@
 #include <fstream>
 #include <conio.h>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 
@@ -139,12 +140,138 @@ void file(string& ex)
 	fin.close();
 }
 
+void PNToInfixVec(string& ex, bool isRev)
+{
+	if (!isRev) reverse(ex.begin(), ex.end());
+	vector<string> vector;
+	string token, buffer, temp1, temp2;
+	stringstream bufStream;
+	bufStream << ex;
+	cin.clear();
+	while (getline(bufStream, token, ' '))
+	{
+		/* Пытаемся распознать текущий аргумент как число или
+		 * символ арифметической операции */
+		switch (parse(token)) {
+		case VAL:
+			vector.push_back(token);
+			break;
+
+			// Вычисление
+		case ADD:
+			if (vector.size >= 2) { // Если операндов >= 2
+				temp1 =  vector.back();
+				vector.pop_back();
+				temp2 = vector.back();
+				vector.pop_back();
+				buffer = "( + )";
+				buffer.insert(1, temp1);
+				buffer.insert(buffer.length() - 1, temp2);
+				vector.push_back(buffer);
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case SUB:
+			if (vector.size >= 2) { // Если операндов >= 2
+				if (isRev)
+				{
+					temp1 = vector.back();
+					vector.pop_back();
+					temp2 = vector.back();
+					vector.pop_back();
+					buffer = "( - )";
+					buffer.insert(1, temp2);
+					buffer.insert(buffer.length() - 1, temp1);
+					vector.push_back(buffer);
+				}
+				else
+				{
+					temp1 = vector.back();
+					vector.pop_back();
+					temp2 = vector.back();
+					vector.pop_back();
+					buffer = "( - )";
+					buffer.insert(1, temp1);
+					buffer.insert(buffer.length() - 1, temp2);
+					vector.push_back(buffer);
+				}
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case MUL:
+			if (vector.size >= 2) { // Если операндов >= 2
+				temp1 = vector.back();
+				vector.pop_back();
+				temp2 = vector.back();
+				vector.pop_back();
+				buffer = " * ";
+				buffer.insert(0, temp1);
+				buffer.insert(buffer.length(), temp2);
+				vector.push_back(buffer);
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case DIV:
+			if (vector.size >= 2) { // Если операндов >= 2
+				if (isRev)
+				{
+					temp1 = vector.back();
+					vector.pop_back();
+					temp2 = vector.back();
+					vector.pop_back();
+					buffer = " / ";
+					buffer.insert(1, temp2);
+					buffer.insert(buffer.length() - 1, temp1);
+					vector.push_back(buffer);
+				}
+				else
+				{
+					temp1 = vector.back();
+					vector.pop_back();
+					temp2 = vector.back();
+					vector.pop_back();
+					buffer = " / ";
+					buffer.insert(1, temp1);
+					buffer.insert(buffer.length() - 1, temp2);
+					vector.push_back(buffer);
+				}
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case UNK:
+			cerr << "Неопознанный аргумент!" << endl;
+			return;
+		}
+	}
+	ex = vector.front();
+}
+
 void PNToInfix(string& ex, bool isRev)
 {
 	if (!isRev) reverse(ex.begin(), ex.end());
 	Stack<string> stack;
 	string token, buffer, temp1, temp2;
-	stringstream bufStream, stackStream;
+	stringstream bufStream;
 	bufStream << ex;
 	cin.clear();
 	while (getline(bufStream, token, ' '))

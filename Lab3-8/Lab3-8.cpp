@@ -142,72 +142,94 @@ void PNToInfix(string& ex, bool isRev)
 			stackPush(&stack, token);
 			break;
 
-			/* Вычисляем */
+			// Вычисление
 		case ADD:
-			temp1 = stackPop(&stack);
-			temp2 = stackPop(&stack);
-			buffer = "( + )";
-			buffer.insert(1, temp1);
-			buffer.insert(buffer.length()-1, temp2);
-			stackPush(&stack, buffer);
-			break;
-
-		case SUB:
-			if (isRev)
-			{
+			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
 				temp1 = stackPop(&stack);
 				temp2 = stackPop(&stack);
-				buffer = "( - )";
-				buffer.insert(1, temp2);
-				buffer.insert(buffer.length() - 1, temp1);
-				stackPush(&stack, buffer);
-			}
-			else
-			{
-				temp1 = stackPop(&stack);
-				temp2 = stackPop(&stack);
-				buffer = "( - )";
+				buffer = "( + )";
 				buffer.insert(1, temp1);
 				buffer.insert(buffer.length() - 1, temp2);
 				stackPush(&stack, buffer);
 			}
-			break;
-
-		case MUL:
-			temp1 = stackPop(&stack);
-			temp2 = stackPop(&stack);
-			buffer = " * ";
-			buffer.insert(0, temp1);
-			buffer.insert(buffer.length(), temp2);
-			stackPush(&stack, buffer);
-			break;
-
-		case DIV:
-			if (isRev)
+			else
 			{
-				temp1 = stackPop(&stack);
-				temp2 = stackPop(&stack);
-				buffer = " / ";
-				buffer.insert(0, temp2);
-				buffer.insert(buffer.length(), temp1);
-				stackPush(&stack, buffer);
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case SUB:
+			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
+				if (isRev)
+				{
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					buffer = "( - )";
+					buffer.insert(1, temp2);
+					buffer.insert(buffer.length() - 1, temp1);
+					stackPush(&stack, buffer);
+				}
+				else
+				{
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					buffer = "( - )";
+					buffer.insert(1, temp1);
+					buffer.insert(buffer.length() - 1, temp2);
+					stackPush(&stack, buffer);
+				}
 			}
 			else
 			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case MUL:
+			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
 				temp1 = stackPop(&stack);
 				temp2 = stackPop(&stack);
-				buffer = " / ";
+				buffer = " * ";
 				buffer.insert(0, temp1);
 				buffer.insert(buffer.length(), temp2);
 				stackPush(&stack, buffer);
 			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
 			break;
 
-
-			/* Обработка ошибок */
-		case SUF:
-			cerr << "Недостаточно операндов!" << endl;
-			return;
+		case DIV:
+			if (stack.head != nullptr && stack.head->next != nullptr) { // Если операндов >= 2
+				if (isRev)
+				{
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					buffer = " / ";
+					buffer.insert(0, temp2);
+					buffer.insert(buffer.length(), temp1);
+					stackPush(&stack, buffer);
+				}
+				else
+				{
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					buffer = " / ";
+					buffer.insert(0, temp1);
+					buffer.insert(buffer.length(), temp2);
+					stackPush(&stack, buffer);
+				}
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
 
 		case UNK:
 			cerr << "Неопознанный аргумент!" << endl;
@@ -224,12 +246,14 @@ void infixToPN(string& ex, bool isRev)
 	string token, buffer, temp1, temp2;
 	stringstream bufStream;
 	bufStream << ex;
+	ex = "";
 	while (getline(bufStream, token, ' '))
 	{
 		// Попытка опознать токен
 		switch (parse(&stack, token)) {
 		case VAL:
-			stackPush(&stack, token);
+			ex += token;
+			ex += " ";
 			break;
 
 		// Вычисление

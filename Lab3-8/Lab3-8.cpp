@@ -1,5 +1,5 @@
 ﻿//TODO: Первичное создание файла, проверочная работа, посчитать скорость, задание по варианту
-//TODO? Сделать массивами, сравнить скорость, infix -> PN
+//TODO? Сделать массивами, сравнить скорость
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -240,7 +240,6 @@ void PNToInfix(string& ex, bool isRev)
 
 void infixToPN(string& ex, bool isRev)
 {
-	//if (!isRev) reverse(ex.begin(), ex.end());
 	Stack<string> stack;
 	string token, buffer, temp1, temp2;
 	stringstream bufStream;
@@ -316,6 +315,7 @@ void infixToPN(string& ex, bool isRev)
 		ex += stackPop(&stack);
 		ex += " ";
 	}
+	if (!isRev) reverse(ex.begin(), ex.end());
 }
 
 bool RPNMenu(string& ex)
@@ -360,7 +360,7 @@ bool infixMenu(string& ex)
 	switch (answer)
 	{
 	case 0:
-		//infixToPN(ex);
+		infixToPN(ex, false);
 		break;
 	case 1:
 		infixToPN(ex, true);

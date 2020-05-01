@@ -62,6 +62,7 @@ template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
 template<typename T>
 int stackCheck(Stack<T>* stack);								// Получить элемент из стака
+float calcInfix(string ex);
 float calcPN(string ex, bool isRev);
 int parse(string s);
 
@@ -433,7 +434,7 @@ void calcMenu()
 	switch (answer)
 	{
 	case 0:
-		//result = calcInfix(ex);
+		result = calcInfix(ex);
 		break;
 	case 1:
 		result = calcPN(ex, false);
@@ -763,6 +764,13 @@ int getAnsAgreement()
 	}
 	system("cls");
 	return choice;
+}
+
+float calcInfix(string ex)
+{
+	infixToPN(ex, true);
+	float result = calcPN(ex, true);
+	return result;
 }
 
 float calcPN(string ex, bool isRev)

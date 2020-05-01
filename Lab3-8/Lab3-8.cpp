@@ -1,5 +1,6 @@
 ﻿//TODO: Первичное создание файла, проверочная работа, посчитать скорость, задание по варианту
 //TODO? Сделать массивами, сравнить скорость
+//BUG: выражение 3 / ( -3 ) + 2 - 1 * 13 неверно обрабатывается
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -70,6 +71,7 @@ void task();
 int main()
 {
 	setlocale(LC_ALL, "russian");
+	srand(time(NULL));
 	agreement();
 	menu();
 	system("pause");
@@ -462,7 +464,7 @@ void menu()
 			//genTest();
 			break;
 		case 3:
-			//task();
+			task();
 			break;
 		case 4:
 			exit(0);
@@ -897,9 +899,47 @@ int parse(string s)
 	return(VAL);
 }
 
+template <typename T>
+void stackShow(Stack<T>* stack)
+{
+	Node<T>* ptr = stack->head;
+	do
+	{
+		cout << ptr->data << " ";
+		ptr = ptr->next;
+	} while (ptr->next != nullptr);
+	cout << endl;
+}
+
 void task()
 {
 	cout << "Вариант №4." << endl
-		<< "Реализуйте стек. Заполните его случайными положительными и отрицательными числами." << endl
-		<< "Преобразуйте стек в два стека. Первый должен содержать только положительные числа, второй – отрицательные." << endl;
+		<< "Реализуйте стак. Заполните его случайными положительными и отрицательными числами." << endl
+		<< "Преобразуйте стак в два стака. Первый должен содержать только положительные числа, второй – отрицательные." << endl << endl;
+
+	Stack<float> general, pos, neg;
+	for (int i = 0; i < 10; i++)
+	{
+		stackPush(&general, rand() % 11 - 5);
+	}
+
+	cout << "Общий стак:" << endl;
+	stackShow(&general);
+
+	Node<float>* ptr = general.head;
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (ptr->data < 0) stackPush(&neg, ptr->data);
+		if (ptr->data > 0) stackPush(&pos, ptr->data);
+		ptr = ptr->next;
+	}
+
+	cout << "Стак положительных чисел:" << endl;
+	stackShow(&pos);
+	cout << "Стак отрицательных чисел:" << endl;
+	stackShow(&neg);
+
+	system("pause");
+
 }

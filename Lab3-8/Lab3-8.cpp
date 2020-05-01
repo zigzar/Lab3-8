@@ -1,4 +1,4 @@
-﻿//TODO: Первичное создание файла, проверочная работа, посчитать скорость, задание по варианту
+﻿//TODO: Первичное создание файла, проверочная работа, посчитать скорость
 //TODO? Сделать массивами, сравнить скорость
 //BUG: выражение 3 / ( -3 ) + 2 - 1 * 13 неверно обрабатывается
 
@@ -780,14 +780,12 @@ float calcPN(string ex, bool isRev)
 	float temp = 0;
 	while (getline(bufStream, token, ' '))
 	{
-		/* Пытаемся распознать текущий аргумент как число или
-		 * символ арифметической операции */
-		switch (parse(token)) {
+		switch (parse(token)) { // Попытка распознать токен
 		case VAL: 
 			stackPush(&stack, stof(token));
 			break;
 
-			/* Вычисляем */
+			// Вычисление
 		case ADD:
 			if (stack.head != nullptr && stack.head->next != nullptr) {
 				stackPush(&stack, stackPop(&stack) + stackPop(&stack));

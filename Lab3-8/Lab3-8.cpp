@@ -1,5 +1,5 @@
 ﻿//TODO: Первичное создание файла, проверка на корректность infix, вычисление infix, проверочная работа, посчитать скорость, задание по варианту
-//TODO? Сделать массивами, сравнить скорость, infix -> PN, infix -> RPN, PN -> infix, PN -> RPN, RPN -> infix, RPN -> PN
+//TODO? Сделать массивами, сравнить скорость, infix -> PN, infix -> RPN
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -75,7 +75,7 @@ int main()
 template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data)
 {
-	Node<N>* node = new Node<N>;
+	Node<T>* node = new Node<T>;
 	node->data = data;
 	node->next = stack->head;
 	stack->head = node;
@@ -126,7 +126,7 @@ void PNToInfix(string& ex, bool isRev)
 {
 	if (!isRev) reverse(ex.begin(), ex.end());
 	Stack<string> stack;
-	string token, buffer, temp;
+	string token, buffer, temp1, temp2;
 	stringstream bufStream, stackStream;
 	bufStream << ex;
 	cin.clear();
@@ -135,49 +135,67 @@ void PNToInfix(string& ex, bool isRev)
 		/* Пытаемся распознать текущий аргумент как число или
 		 * символ арифметической операции */
 		switch (parse(&stack, token)) {
-		case VAL: continue;
+		case VAL: 
+			stackPush(&stack, token);
+			break;
 
 			/* Вычисляем */
 		case ADD:
-			stackStream << "(" << stackPop(&stack) << " + " << stackPop(&stack) << ")";
-			stackStream >> buffer;
+			temp1 = stackPop(&stack);
+			temp2 = stackPop(&stack);
+			buffer = "( + )";
+			buffer.insert(1, temp1);
+			buffer.insert(buffer.length()-1, temp2);
 			stackPush(&stack, buffer);
 			break;
 
 		case SUB:
 			if (isRev)
 			{
-				temp = stackPop(&stack);
-				stackStream << "(" << stackPop(&stack) << " - " << temp << ")";
-				stackStream >> buffer;
+				temp1 = stackPop(&stack);
+				temp2 = stackPop(&stack);
+				buffer = "( - )";
+				buffer.insert(1, temp2);
+				buffer.insert(buffer.length() - 1, temp1);
 				stackPush(&stack, buffer);
 			}
 			else
 			{
-				stackStream << "(" << stackPop(&stack) << " - " << stackPop(&stack) << ")";
-				stackStream >> buffer;
+				temp1 = stackPop(&stack);
+				temp2 = stackPop(&stack);
+				buffer = "( - )";
+				buffer.insert(1, temp1);
+				buffer.insert(buffer.length() - 1, temp2);
 				stackPush(&stack, buffer);
 			}
 			break;
 
 		case MUL:
-			stackStream << stackPop(&stack) << " * " << stackPop(&stack);
-			stackStream >> buffer;
+			temp1 = stackPop(&stack);
+			temp2 = stackPop(&stack);
+			buffer = " * ";
+			buffer.insert(0, temp1);
+			buffer.insert(buffer.length(), temp2);
 			stackPush(&stack, buffer);
 			break;
 
 		case DIV:
 			if (isRev)
 			{
-				temp = stackPop(&stack);
-				stackStream << stackPop(&stack) << " - " << temp;
-				stackStream >> buffer;
+				temp1 = stackPop(&stack);
+				temp2 = stackPop(&stack);
+				buffer = " / ";
+				buffer.insert(0, temp2);
+				buffer.insert(buffer.length(), temp1);
 				stackPush(&stack, buffer);
 			}
 			else
 			{
-				stackStream << stackPop(&stack) << " - " << stackPop(&stack);
-				stackStream >> buffer;
+				temp1 = stackPop(&stack);
+				temp2 = stackPop(&stack);
+				buffer = " / ";
+				buffer.insert(0, temp1);
+				buffer.insert(buffer.length(), temp2);
 				stackPush(&stack, buffer);
 			}
 			break;
@@ -656,7 +674,9 @@ float calcPN(string ex, bool isRev)
 		/* Пытаемся распознать текущий аргумент как число или
 		 * символ арифметической операции */
 		switch (parse(&stack, token)) {
-		case VAL: continue;
+		case VAL: 
+			stackPush(&stack, stof(token));
+			break;
 
 			/* Вычисляем */
 		case ADD:
@@ -742,23 +762,30 @@ int parse(Stack<T>* stack, string s)
 		else return(SUF);
 	}
 
-	
-	if (sizeof(tval) == sizeof(float) || sizeof(tval) == sizeof(float))	// Если работаем с числовым стаком
+	try																// Попытаться сконвертировать строковый аргумент в число
 	{
-		try																// Попытаться сконвертировать строковый аргумент в число
-		{
-			tval = stof(s);
-		}
-		catch (const std::exception&)
-		{
-			return(UNK);
-		}
-		stackPush(stack, tval);		// Сохранить число в стак
+		tval = stof(s);
 	}
-	else
+	catch (const std::exception&)
 	{
-		stackPush(stack, s);
+		return(UNK);
 	}
 
+	//if (sizeof(tval) == sizeof(float) || sizeof(tval) == sizeof(double))	// Если работаем с числовым стаком
+	//{
+	//	try																// Попытаться сконвертировать строковый аргумент в число
+	//	{
+	//		tval = stof(s);
+	//	}
+	//	catch (const std::exception&)
+	//	{
+	//		return(UNK);
+	//	}
+	//	stackPush(stack, tval);		// Сохранить число в стак
+	//}
+	//else
+	//{
+	//	stackPush(stack, s);
+	//}
 	return(VAL);
 }

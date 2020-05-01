@@ -11,6 +11,7 @@
 #include <sstream>
 #include <fstream>
 #include <conio.h>
+#include <ctime>
 
 using namespace std;
 
@@ -63,6 +64,8 @@ T stackPop(Stack<T>* stack);								// Удалить элемент из ста
 float calcInfix(string ex);
 float calcPN(string ex, bool isRev);
 int parse(string s);
+
+void task();
 
 int main()
 {
@@ -892,4 +895,11 @@ int parse(string s)
 	}
 
 	return(VAL);
+}
+
+void task()
+{
+	cout << "Вариант №4." << endl
+		<< "Реализуйте стек. Заполните его случайными положительными и отрицательными числами." << endl
+		<< "Преобразуйте стек в два стека. Первый должен содержать только положительные числа, второй – отрицательные." << endl;
 }

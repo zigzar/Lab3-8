@@ -59,7 +59,7 @@ void stackPush(Stack<T>* stack, N data);					// Добавить элемент 
 template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
 template<typename T>
-float stackGet(Stack<T>* stack);								// Получить элемент из стака
+float stackCheck(Stack<T>* stack);								// Получить элемент из стака
 float calcPN(string ex, bool isRev);
 template<typename T>
 int parse(Stack<T>* stack, string s);
@@ -94,9 +94,10 @@ T stackPop(Stack<T>* stack)
 }
 
 template<typename T>
-float stackGet(Stack<T>* stack)
+float stackCheck(Stack<T>* stack)
 {
-	return stack->head->data;
+	int token = parse(stack, to_string(stack->head->data))
+	return token;
 }
 
 void console(string& ex)
@@ -212,6 +213,11 @@ void PNToInfix(string& ex, bool isRev)
 		}
 	}
 	ex = stack.head->data;
+}
+
+void infixToPN(string& ex, bool isRev)
+{
+
 }
 
 bool RPNMenu(string& ex)
@@ -341,7 +347,8 @@ void calcMenu()
 		return;
 		break;
 	}
-
+	cout << ex << " = " << result << endl;
+	system("pause");
 }
 
 void menu()
@@ -771,21 +778,5 @@ int parse(Stack<T>* stack, string s)
 		return(UNK);
 	}
 
-	//if (sizeof(tval) == sizeof(float) || sizeof(tval) == sizeof(double))	// Если работаем с числовым стаком
-	//{
-	//	try																// Попытаться сконвертировать строковый аргумент в число
-	//	{
-	//		tval = stof(s);
-	//	}
-	//	catch (const std::exception&)
-	//	{
-	//		return(UNK);
-	//	}
-	//	stackPush(stack, tval);		// Сохранить число в стак
-	//}
-	//else
-	//{
-	//	stackPush(stack, s);
-	//}
 	return(VAL);
 }

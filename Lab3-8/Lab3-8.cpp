@@ -60,8 +60,6 @@ template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
 template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
-template<typename T>
-int stackCheck(Stack<T>* stack);								// Получить элемент из стака
 float calcInfix(string ex);
 float calcPN(string ex, bool isRev);
 int parse(string s);
@@ -93,13 +91,6 @@ T stackPop(Stack<T>* stack)
 
 	delete temp;
 	return data;
-}
-
-template<typename T>
-int stackCheck(Stack<T>* stack)
-{
-	int token = parse(stack->head->data);
-	return token;
 }
 
 void console(string& ex)

@@ -186,7 +186,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -218,7 +218,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -236,7 +236,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -268,13 +268,13 @@ void PNToInfixVec(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
 
 		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
+			cerr << "Неопознанный аргумент!" << endl;system("pause");
 			return;
 		}
 	}
@@ -361,7 +361,7 @@ void PNToInfix(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -389,7 +389,7 @@ void PNToInfix(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -405,7 +405,7 @@ void PNToInfix(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
@@ -433,13 +433,13 @@ void PNToInfix(string& ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
+				cerr << "Недостаточно операндов!" << endl;system("pause");
 				return;
 			}
 			break;
 
 		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
+			cerr << "Неопознанный аргумент!" << endl;system("pause");
 			return;
 		}
 	}
@@ -1004,7 +1004,6 @@ float calcPNVec(string ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
 				return(1);
 			}
 			break;
@@ -1025,7 +1024,6 @@ float calcPNVec(string ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
 				return(1);
 			}
 			break;
@@ -1039,7 +1037,6 @@ float calcPNVec(string ex, bool isRev)
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
 				return(1);
 			}
 			break;
@@ -1062,19 +1059,16 @@ float calcPNVec(string ex, bool isRev)
 				}
 				catch (const std::exception&)
 				{
-					cerr << "Деление на ноль запрещено!" << endl;
 					return(NULL);
 				}
 			}
 			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
 				return(1);
 			}
 			break;
 
 		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
 			return(1);
 		}
 	}
@@ -1083,95 +1077,104 @@ float calcPNVec(string ex, bool isRev)
 
 float calcPN(string ex, bool isRev)
 {
-	if (!isRev) reverse(ex.begin(), ex.end());
-	Stack<float> stack;
-	string token;
-	stringstream bufStream;
-	bufStream << ex;
-	cin.clear();
-	float temp = 0;
-	while (getline(bufStream, token, ' '))
+	try
 	{
-		switch (parse(token)) { // Попытка распознать токен
-		case VAL: 
-			stackPush(&stack, stof(token));
-			break;
+		if (!isRev) reverse(ex.begin(), ex.end());
+		Stack<float> stack;
+		string token;
+		stringstream bufStream;
+		bufStream << ex;
+		cin.clear();
+		float temp = 0;
+		while (getline(bufStream, token, ' '))
+		{
+			switch (parse(token)) { // Попытка распознать токен
+			case VAL:
+				stackPush(&stack, stof(token));
+				break;
 
-			// Вычисление
-		case ADD:
-			if (stack.head != nullptr && stack.head->next != nullptr) {
-				stackPush(&stack, stackPop(&stack) + stackPop(&stack));
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return(1);
-			}
-			break;
-
-		case SUB:
-			if (stack.head != nullptr && stack.head->next != nullptr) {
-				if (isRev)
-				{
-					temp = stackPop(&stack);
-					stackPush(&stack, stackPop(&stack) - temp);
+				// Вычисление
+			case ADD:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					stackPush(&stack, stackPop(&stack) + stackPop(&stack));
 				}
 				else
 				{
-					stackPush(&stack, stackPop(&stack) - stackPop(&stack));
+					throw "Недостаточно операндов!";
 				}
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return(1);
-			}
-			break;
+				break;
 
-		case MUL:
-			if (stack.head != nullptr && stack.head->next != nullptr) {
-				stackPush(&stack, stackPop(&stack) * stackPop(&stack));
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return(1);
-			}
-			break;
-
-		case DIV:
-			if (stack.head != nullptr && stack.head->next != nullptr) {
-				try
-				{
+			case SUB:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
 					if (isRev)
 					{
 						temp = stackPop(&stack);
-						stackPush(&stack, stackPop(&stack) / temp);
+						stackPush(&stack, stackPop(&stack) - temp);
 					}
 					else
 					{
-						stackPush(&stack, stackPop(&stack) / stackPop(&stack));
+						stackPush(&stack, stackPop(&stack) - stackPop(&stack));
 					}
 				}
-				catch (const std::exception&)
+				else
 				{
-					cerr << "Деление на ноль запрещено!" << endl;
-					return(NULL);
+					throw "Недостаточно операндов!";
 				}
-			}
-			else
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return(1);
-			}
-			break;
+				break;
 
-		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
-			return(1);
+			case MUL:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					stackPush(&stack, stackPop(&stack) * stackPop(&stack));
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case DIV:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					try
+					{
+						if (isRev)
+						{
+							temp = stackPop(&stack);
+							stackPush(&stack, stackPop(&stack) / temp);
+						}
+						else
+						{
+							stackPush(&stack, stackPop(&stack) / stackPop(&stack));
+						}
+					}
+					catch (const std::exception&)
+					{
+						throw "Деление на ноль запрещено!";
+					}
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case UNK:
+				throw "Неопознанный аргумент!";
+			}
 		}
+		return stack.head->data;
 	}
-	return stack.head->data;
+	catch (const char* exception)
+	{
+		cerr << exception << endl;
+		system("pause");
+		return 0;
+	}
+	catch (const std::exception&)
+	{
+		cerr << "Неверное выражение!" << endl;
+		system("pause");
+		return 0;
+	}
 }
 
 int parse(string s)

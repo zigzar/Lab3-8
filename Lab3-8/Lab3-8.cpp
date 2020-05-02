@@ -1,5 +1,4 @@
 ﻿//TODO: Проверочная работа, посчитать скорость
-//TODO? Сравнить скорость
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -42,7 +41,9 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
-double elapsed_seconds;
+double listTime;
+double arrayTime;
+chrono::time_point<chrono::high_resolution_clock> timerStart, timerEnd;
 
 bool RPNMenu(string& ex);
 bool PNMenu(string& ex);
@@ -86,7 +87,7 @@ int main()
 {
 	setlocale(LC_ALL, "russian");
 	srand(time(NULL));
-	chrono::time_point<chrono::high_resolution_clock> start, end;
+	cout.setf(ios::fixed);
 	agreement();
 	newFile();
 	menu();
@@ -601,25 +602,50 @@ void calcMenu()
 
 	if (inpMenu(ex)) return;		// Если выбрано "Назад", выйти из меню вычисления
 
-	float result;
+	float result = 0;
 
 	int answer = getAnsNot();
 	switch (answer)
 	{
 	case 0:
+		timerStart = chrono::high_resolution_clock::now();
 		result = calcInfix(ex);
+		timerEnd = chrono::high_resolution_clock::now();
+		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
+		timerStart = chrono::high_resolution_clock::now();
+		result = calcInfixVec(ex);
+		timerEnd = chrono::high_resolution_clock::now();
+		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
 	case 1:
+		timerStart = chrono::high_resolution_clock::now();
 		result = calcPN(ex, false);
+		timerEnd = chrono::high_resolution_clock::now();
+		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
+		timerStart = chrono::high_resolution_clock::now();
+		result = calcPNVec(ex, false);
+		timerEnd = chrono::high_resolution_clock::now();
+		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
 	case 2:
+		timerStart = chrono::high_resolution_clock::now();
 		result = calcPN(ex, true);
+		timerEnd = chrono::high_resolution_clock::now();
+		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
+		timerStart = chrono::high_resolution_clock::now();
+		result = calcPNVec(ex, true);
+		timerEnd = chrono::high_resolution_clock::now();
+		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
 	case 3:
 		return;
 		break;
 	}
+	cout.unsetf(ios::fixed);
 	cout << ex << " = " << result << endl;
+	cout.setf(ios::fixed);
+	cout << "Время вычисления списком: " << listTime / 1000000000 << " c" << endl;
+	cout << "Время вычисления массивом: " << arrayTime / 1000000000 << " c" << endl;
 	system("pause");
 }
 
@@ -1212,22 +1238,26 @@ void task()
 		<< "Реализуйте стак. Заполните его случайными положительными и отрицательными числами." << endl
 		<< "Преобразуйте стак в два стака. Первый должен содержать только положительные числа, второй – отрицательные." << endl << endl;
 
+	timerStart = chrono::high_resolution_clock::now();
 	Stack<float> general, pos, neg, copy;
-
 	for (int i = 0; i < 10; i++)
 	{
 		stackPush(&general, rand() % 11 - 5);
 	}
-
+	timerEnd = chrono::high_resolution_clock::now();
+	double listTime1 = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 	stackCopy(&general, &copy);			// Сделать копию стака для вывода в консоль
-
+	timerStart = chrono::high_resolution_clock::now();
 	for (int i = 0; i < 10; i++)
 	{
 		if (general.head->data < 0) stackPush(&neg, general.head->data);
 		if (general.head->data > 0) stackPush(&pos, general.head->data);
 		stackPop(&general);
 	}
+	timerEnd = chrono::high_resolution_clock::now();
+	double listTime2 = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 
+	timerStart = chrono::high_resolution_clock::now();
 	vector<float> generalV, posV, negV;
 	for (int i = 0; i < 10; i++)
 	{
@@ -1239,13 +1269,19 @@ void task()
 		if (generalV.back() > 0) posV.push_back(generalV.back());
 		generalV.pop_back();
 	}
+	timerEnd = chrono::high_resolution_clock::now();
+	arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 
+	cout.precision(0);
 	cout << "Общий стак:" << endl;
 	stackShow(&copy);
 	cout << "Стак положительных чисел:" << endl;
 	if (pos.head != nullptr) stackShow(&pos);		// Если стак не пустой, вывести числа
 	cout << "Стак отрицательных чисел:" << endl;
 	if (neg.head != nullptr) stackShow(&neg);		// Если стак не пустой, вывести числа
+	cout.precision(7);
+	cout << "Время выполнения списком: " << (listTime1 + listTime2) / 1000000000 << " c" << endl;
+	cout << "Время выполнения массивом: " << arrayTime / 1000000000 << " c" << endl;
 
 	system("pause");
 

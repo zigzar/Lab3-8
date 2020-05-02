@@ -42,6 +42,8 @@ struct Stack													// Стак
 	Node<T>* head = nullptr;									// Первый элемент стака
 };
 
+double elapsed_seconds;
+
 bool RPNMenu(string& ex);
 bool PNMenu(string& ex);
 bool infixMenu(string& ex);

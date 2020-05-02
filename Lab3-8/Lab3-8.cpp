@@ -12,6 +12,7 @@
 #include <fstream>
 #include <conio.h>
 #include <ctime>
+#include <chrono>
 #include <vector>
 
 using namespace std;
@@ -59,6 +60,8 @@ int getAnsMenu();
 int getAnsAgreement();
 
 void newFile();
+void console(string& ex);
+void file(string& ex);
 
 template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
@@ -81,6 +84,7 @@ int main()
 {
 	setlocale(LC_ALL, "russian");
 	srand(time(NULL));
+	chrono::time_point<chrono::high_resolution_clock> start, end;
 	agreement();
 	newFile();
 	menu();

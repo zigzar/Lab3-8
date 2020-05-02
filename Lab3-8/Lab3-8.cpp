@@ -280,7 +280,7 @@ void PNToInfixVec(string& ex, bool isRev)
 
 void infixToPNVec(string& ex, bool isRev)
 {
-	Stack<string> stack;
+	vector<string> stack;
 	string op, token;
 	stringstream bufStream;
 	bufStream << ex;
@@ -295,31 +295,35 @@ void infixToPNVec(string& ex, bool isRev)
 		}
 		else
 		{
-			if (tokenType == BRO) stackPush(&stack, token);
+			if (tokenType == BRO) stack.push_back(token);
 			else if (tokenType == BRC)
 			{
-				op = stackPop(&stack);
+				op = stack.back();
+				stack.pop_back();
 				while (parse(op) != BRO)
 				{
 					ex += op;
 					ex += " ";
-					op = stackPop(&stack);
+					op = stack.back();
+					stack.pop_back();
 				}
 			}
 			else
 			{
-				while (stack.head != nullptr && int(parse(stack.head->data) / 10) > tokenType / 10)
+				while (stack.size() != 0 && int(parse(stack.back()) / 10) > tokenType / 10)
 				{
-					ex += stackPop(&stack);
+					ex += stack.back();
+					stack.pop_back();
 					ex += " ";
 				}
-				stackPush(&stack, token);
+				stack.push_back(token);
 			}
 		}
 	}
-	while (stack.head != nullptr)
+	while (stack.size() != 0)
 	{
-		ex += stackPop(&stack);
+		ex += stack.back();
+		stack.pop_back();
 		ex += " ";
 	}
 	if (!isRev) reverse(ex.begin(), ex.end());

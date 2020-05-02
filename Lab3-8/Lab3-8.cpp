@@ -67,7 +67,14 @@ template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
 float calcInfix(string ex);
 float calcPN(string ex, bool isRev);
+void infixToPN(string& ex, bool isRev);
+void PNToInfix(string& ex, bool isRev);
 int parse(string s);
+
+float calcInfixVec(string ex);
+float calcPNVec(string ex, bool isRev);
+void infixToPNVec(string& ex, bool isRev);
+void PNToInfixVec(string& ex, bool isRev);
 
 void task();
 
@@ -265,7 +272,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			return;
 		}
 	}
-	ex = vector.front();
+	ex = vector.back();
 }
 
 void infixToPNVec(string& ex, bool isRev)
@@ -992,11 +999,120 @@ int getAnsAgreement()
 	return choice;
 }
 
+float calcInfixVec(string ex)
+{
+	infixToPNVec(ex, true);
+	float result = calcPNVec(ex, true);
+	return result;
+}
+
 float calcInfix(string ex)
 {
 	infixToPN(ex, true);
 	float result = calcPN(ex, true);
 	return result;
+}
+
+float calcPNVec(string ex, bool isRev)
+{
+	if (!isRev) reverse(ex.begin(), ex.end());
+	vector<float> vector;
+	string token;
+	stringstream bufStream;
+	bufStream << ex;
+	float temp = 0;
+	while (getline(bufStream, token, ' '))
+	{
+		switch (parse(token)) { // Попытка распознать токен
+		case VAL:
+			vector.push_back(stof(token));
+			break;
+
+			// Вычисление
+		case ADD:
+			if (vector.size() >= 2) {
+				temp = vector[vector.size() - 1] + vector[vector.size() - 2];
+				vector.pop_back();
+				vector.pop_back();
+				vector.push_back(temp);
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return(1);
+			}
+			break;
+
+		case SUB:
+			if (vector.size() >= 2) {
+				if (isRev)
+				{
+					temp = vector[vector.size() - 2] - vector[vector.size() - 1];
+				}
+				else
+				{
+					temp = vector[vector.size() - 1] - vector[vector.size() - 2];
+				}
+				vector.pop_back();
+				vector.pop_back();
+				vector.push_back(temp);
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return(1);
+			}
+			break;
+
+		case MUL:
+			if (vector.size() >= 2) {
+				temp = vector[vector.size() - 1] + vector[vector.size() - 2];
+				vector.pop_back();
+				vector.pop_back();
+				vector.push_back(temp);
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return(1);
+			}
+			break;
+
+		case DIV:
+			if (vector.size() >= 2) {
+				try
+				{
+					if (isRev)
+					{
+						temp = vector[vector.size() - 2] / vector[vector.size() - 1];
+					}
+					else
+					{
+						temp = vector[vector.size() - 1] / vector[vector.size() - 2];
+					}
+					vector.pop_back();
+					vector.pop_back();
+					vector.push_back(temp);
+				}
+				catch (const std::exception&)
+				{
+					cerr << "Деление на ноль запрещено!" << endl;
+					return(NULL);
+				}
+			}
+			else
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return(1);
+			}
+			break;
+
+		case UNK:
+			cerr << "Неопознанный аргумент!" << endl;
+			return(1);
+		}
+	}
+	return vector.back();
 }
 
 float calcPN(string ex, bool isRev)
@@ -1128,6 +1244,17 @@ int parse(string s)
 }
 
 template <typename T>
+void stackCopy(Stack<T>* stack, Stack<T>* copy)
+{
+	Node<T>* ptr = stack->head;
+	do
+	{
+		stackPush(copy, ptr->data);
+		ptr = ptr->next;
+	} while (ptr != nullptr);
+}
+
+template <typename T>
 void stackShow(Stack<T>* stack)
 {
 	Node<T>* ptr = stack->head;
@@ -1135,7 +1262,7 @@ void stackShow(Stack<T>* stack)
 	{
 		cout << ptr->data << " ";
 		ptr = ptr->next;
-	} while (ptr->next != nullptr);
+	} while (ptr != nullptr);
 	cout << endl;
 }
 
@@ -1145,28 +1272,40 @@ void task()
 		<< "Реализуйте стак. Заполните его случайными положительными и отрицательными числами." << endl
 		<< "Преобразуйте стак в два стака. Первый должен содержать только положительные числа, второй – отрицательные." << endl << endl;
 
-	Stack<float> general, pos, neg;
+	Stack<float> general, pos, neg, copy;
+
 	for (int i = 0; i < 10; i++)
 	{
 		stackPush(&general, rand() % 11 - 5);
 	}
 
-	cout << "Общий стак:" << endl;
-	stackShow(&general);
-
-	Node<float>* ptr = general.head;
+	stackCopy(&general, &copy);			// Сделать копию стака для вывода в консоль
 
 	for (int i = 0; i < 10; i++)
 	{
-		if (ptr->data < 0) stackPush(&neg, ptr->data);
-		if (ptr->data > 0) stackPush(&pos, ptr->data);
-		ptr = ptr->next;
+		if (general.head->data < 0) stackPush(&neg, general.head->data);
+		if (general.head->data > 0) stackPush(&pos, general.head->data);
+		stackPop(&general);
 	}
 
+	vector<float> generalV, posV, negV;
+	for (int i = 0; i < 10; i++)
+	{
+		generalV.push_back(rand() % 11 - 5);
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		if (generalV.back() < 0) negV.push_back(generalV.back());
+		if (generalV.back() > 0) posV.push_back(generalV.back());
+		generalV.pop_back();
+	}
+
+	cout << "Общий стак:" << endl;
+	stackShow(&copy);
 	cout << "Стак положительных чисел:" << endl;
-	stackShow(&pos);
+	if (pos.head != nullptr) stackShow(&pos);		// Если стак не пустой, вывести числа
 	cout << "Стак отрицательных чисел:" << endl;
-	stackShow(&neg);
+	if (neg.head != nullptr) stackShow(&neg);		// Если стак не пустой, вывести числа
 
 	system("pause");
 

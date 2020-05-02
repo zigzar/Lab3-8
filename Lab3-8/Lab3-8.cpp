@@ -59,6 +59,8 @@ int getAnsNot();
 int getAnsMenu();
 int getAnsAgreement();
 
+void newFile();
+
 template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
 template<typename T>
@@ -159,7 +161,7 @@ void PNToInfixVec(string& ex, bool isRev)
 
 			// Вычисление
 		case ADD:
-			if (vector.size >= 2) { // Если операндов >= 2
+			if (vector.size() >= 2) { // Если операндов >= 2
 				temp1 =  vector.back();
 				vector.pop_back();
 				temp2 = vector.back();
@@ -177,7 +179,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			break;
 
 		case SUB:
-			if (vector.size >= 2) { // Если операндов >= 2
+			if (vector.size() >= 2) { // Если операндов >= 2
 				if (isRev)
 				{
 					temp1 = vector.back();
@@ -209,7 +211,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			break;
 
 		case MUL:
-			if (vector.size >= 2) { // Если операндов >= 2
+			if (vector.size() >= 2) { // Если операндов >= 2
 				temp1 = vector.back();
 				vector.pop_back();
 				temp2 = vector.back();
@@ -227,7 +229,7 @@ void PNToInfixVec(string& ex, bool isRev)
 			break;
 
 		case DIV:
-			if (vector.size >= 2) { // Если операндов >= 2
+			if (vector.size() >= 2) { // Если операндов >= 2
 				if (isRev)
 				{
 					temp1 = vector.back();
@@ -264,6 +266,89 @@ void PNToInfixVec(string& ex, bool isRev)
 		}
 	}
 	ex = vector.front();
+}
+
+void infixToPNVec(string& ex, bool isRev)
+{
+	vector<string> vector;
+	string token, buffer, temp1, temp2;
+	stringstream bufStream;
+	bufStream << ex;
+	ex = "";
+	while (getline(bufStream, token, ' '))
+	{
+		// Попытка опознать токен
+		int tokenType = parse(token);
+		switch (tokenType) {
+		case VAL:
+			ex += token;
+			ex += " ";
+			break;
+
+		case ADD:
+		case SUB:
+		case MUL:
+		case DIV:
+			try
+			{
+				if (vector.size() != 0)
+				{
+					while (parse(vector.back()) / 10 >= tokenType)	// Пока приоритет оператора на вершине стака >= текущего оператора
+					{
+						ex += vector.back();
+						vector.pop_back();
+						ex += " ";
+					}
+				}
+				vector.push_back(token);
+
+			}
+			catch (const std::exception&)
+			{
+				cerr << "Недостаточно операндов!" << endl;
+				return;
+			}
+			break;
+
+		case BRO:
+			vector.push_back(token);
+			break;
+
+		case BRC:
+			while (parse(vector.back()) != BRO)				// Пока токен на вершине стека не является открывающей скобкой			
+			{
+				ex += vector.back();
+				vector.pop_back();
+				ex += " ";
+
+				if (vector.size() == 0)
+				{
+					cerr << "В выражении пропущена скобка" << endl;
+					return;
+				};
+			}
+			vector.pop_back();									// Выкинуть открывающую скобку из стака
+
+			break;
+
+		case UNK:
+			cerr << "Неопознанный аргумент!" << endl;
+			return;
+		}
+	}
+	while (vector.size() != 0)
+	{
+		int tokenType = parse(vector.back());
+		if (tokenType == BRO || tokenType == BRC)
+		{
+			cerr << "В выражении присутствует незакрытая скобка!" << endl;
+			return;
+		}
+		ex += vector.back();
+		vector.pop_back();
+		ex += " ";
+	}
+	if (!isRev) reverse(ex.begin(), ex.end());
 }
 
 void PNToInfix(string& ex, bool isRev)

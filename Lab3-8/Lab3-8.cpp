@@ -1,6 +1,5 @@
 ﻿//TODO: Проверочная работа, посчитать скорость
 //TODO? Сравнить скорость
-//BUG: выражение 3 / ( -3 ) + 2 - 1 * 13 неверно обрабатывается
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -475,7 +474,7 @@ void PNToInfix(string& ex, bool isRev)
 void infixToPN(string& ex, bool isRev)
 {
 	Stack<string> stack;
-	string token, buffer, temp1, temp2;
+	string op, token;
 	stringstream bufStream;
 	bufStream << ex;
 	ex = "";
@@ -483,69 +482,36 @@ void infixToPN(string& ex, bool isRev)
 	{
 		// Попытка опознать токен
 		int tokenType = parse(token);
-		switch (tokenType) {
-		case VAL:
+		if (tokenType == VAL) {
 			ex += token;
 			ex += " ";
-			break;
-
-		case ADD:
-		case SUB:
-		case MUL:
-		case DIV:
-			try
-			{	
-				if (stack.head != nullptr)
+		}
+		else
+		{
+			if (tokenType == BRO) stackPush(&stack, token);
+			else if (tokenType == BRC)
+			{
+				op = stackPop(&stack);
+				while (parse(op) != BRO)
 				{
-					while (parse(stack.head->data) / 10 >= tokenType)	// Пока приоритет оператора на вершине стака >= текущего оператора
-					{
-						ex += stackPop(&stack);
-						ex += " ";
-					}
+					ex += op;
+					ex += " ";
+					op = stackPop(&stack);
+				}
+			}
+			else
+			{
+				while (stack.head != nullptr && int(parse(stack.head->data) / 10) > tokenType / 10)
+				{
+					ex += stackPop(&stack);
+					ex += " ";
 				}
 				stackPush(&stack, token);
-
 			}
-			catch (const std::exception&)
-			{
-				cerr << "Недостаточно операндов!" << endl;
-				return;
-			}
-			break;
-
-		case BRO:
-			stackPush(&stack, token);
-			break;
-
-		case BRC:
-			while (parse(stack.head->data) != BRO)				// Пока токен на вершине стека не является открывающей скобкой			
-			{
-				ex += stackPop(&stack);
-				ex += " ";
-
-				if (stack.head == nullptr)
-				{
-					cerr << "В выражении пропущена скобка" << endl;
-					return;
-				};
-			}
-			stackPop(&stack);									// Выкинуть открывающую скобку из стака
-
-			break;
-
-		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
-			return;
 		}
 	}
 	while (stack.head != nullptr)
 	{
-		int tokenType = parse(stack.head->data);
-		if (tokenType == BRO || tokenType == BRC)
-		{
-			cerr << "В выражении присутствует незакрытая скобка!" << endl;
-			return;
-		}
 		ex += stackPop(&stack);
 		ex += " ";
 	}

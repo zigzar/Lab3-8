@@ -280,8 +280,8 @@ void PNToInfixVec(string& ex, bool isRev)
 
 void infixToPNVec(string& ex, bool isRev)
 {
-	vector<string> vector;
-	string token, buffer, temp1, temp2;
+	Stack<string> stack;
+	string op, token;
 	stringstream bufStream;
 	bufStream << ex;
 	ex = "";
@@ -289,73 +289,37 @@ void infixToPNVec(string& ex, bool isRev)
 	{
 		// Попытка опознать токен
 		int tokenType = parse(token);
-		switch (tokenType) {
-		case VAL:
+		if (tokenType == VAL) {
 			ex += token;
 			ex += " ";
-			break;
-
-		case ADD:
-		case SUB:
-		case MUL:
-		case DIV:
-			try
+		}
+		else
+		{
+			if (tokenType == BRO) stackPush(&stack, token);
+			else if (tokenType == BRC)
 			{
-				if (vector.size() != 0)
+				op = stackPop(&stack);
+				while (parse(op) != BRO)
 				{
-					while (parse(vector.back()) / 10 >= tokenType)	// Пока приоритет оператора на вершине стака >= текущего оператора
-					{
-						ex += vector.back();
-						vector.pop_back();
-						ex += " ";
-					}
+					ex += op;
+					ex += " ";
+					op = stackPop(&stack);
 				}
-				vector.push_back(token);
-
 			}
-			catch (const std::exception&)
+			else
 			{
-				cerr << "Недостаточно операндов!" << endl;
-				return;
-			}
-			break;
-
-		case BRO:
-			vector.push_back(token);
-			break;
-
-		case BRC:
-			while (parse(vector.back()) != BRO)				// Пока токен на вершине стека не является открывающей скобкой			
-			{
-				ex += vector.back();
-				vector.pop_back();
-				ex += " ";
-
-				if (vector.size() == 0)
+				while (stack.head != nullptr && int(parse(stack.head->data) / 10) > tokenType / 10)
 				{
-					cerr << "В выражении пропущена скобка" << endl;
-					return;
-				};
+					ex += stackPop(&stack);
+					ex += " ";
+				}
+				stackPush(&stack, token);
 			}
-			vector.pop_back();									// Выкинуть открывающую скобку из стака
-
-			break;
-
-		case UNK:
-			cerr << "Неопознанный аргумент!" << endl;
-			return;
 		}
 	}
-	while (vector.size() != 0)
+	while (stack.head != nullptr)
 	{
-		int tokenType = parse(vector.back());
-		if (tokenType == BRO || tokenType == BRC)
-		{
-			cerr << "В выражении присутствует незакрытая скобка!" << endl;
-			return;
-		}
-		ex += vector.back();
-		vector.pop_back();
+		ex += stackPop(&stack);
 		ex += " ";
 	}
 	if (!isRev) reverse(ex.begin(), ex.end());

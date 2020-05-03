@@ -1233,6 +1233,7 @@ float calcPN(string ex, bool isRev)
 float calcTest(string ex, bool isRev, bool showMessage)
 {
 	ofstream fout;
+	fout.open(answerFile, ios::app);
 	try
 	{
 		if (!isRev)
@@ -1244,7 +1245,6 @@ float calcTest(string ex, bool isRev, bool showMessage)
 		string token;
 		stringstream bufStream;
 		bufStream << ex;
-		cin.clear();
 		float temp1 = 0;
 		float temp2 = 0;
 		while (getline(bufStream, token, ' '))
@@ -1254,9 +1254,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 				stackPush(&stack, stof(token));
 				if (showMessage)
 				{
-					fout << "Добавляем число " << token << " в стак" << endl
-						<< "Стак: "; stackShow(&stack, showMessage);
-					fout << endl;
+					fout << "Добавляем число " << token << " в стак" << endl;
+					stackShow(&stack, true);
 				}
 				break;
 
@@ -1268,9 +1267,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и складываем: " << temp2 << " + " << temp1 << " = " << temp2 + temp1 << endl;
 					stackPush(&stack, temp1 + temp2);
 					if (showMessage) {
-						fout << "Добавляем число " << temp2 + temp1 << " в стак" << endl
-							 << "Стак: "; stackShow(&stack, showMessage);
-						fout << endl;
+						fout << "Добавляем число " << temp2 + temp1 << " в стак" << endl;
+						stackShow(&stack, true);
 					}
 				}
 				else
@@ -1289,9 +1287,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 						stackPush(&stack, temp2 - temp1);
 						if (showMessage)
 						{ 
-							fout << "Добавляем число " << temp2 - temp1 << " в стак" << endl
-								<< "Стак: "; stackShow(&stack, showMessage);
-							fout << endl;
+							fout << "Добавляем число " << temp2 - temp1 << " в стак" << endl;
+							stackShow(&stack, true);
 						}
 					}
 					else
@@ -1302,9 +1299,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 						stackPush(&stack, temp1 - temp2);
 						if (showMessage)
 						{ 
-							fout << "Добавляем число " << temp1 - temp2 << " в стак" << endl
-								<< "Стак: "; stackShow(&stack, showMessage);
-							fout << endl;
+							fout << "Добавляем число " << temp1 - temp2 << " в стак" << endl;
+							stackShow(&stack, true);
 						}
 					}
 				}
@@ -1322,9 +1318,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 					stackPush(&stack, temp2 * temp1);
 					if (showMessage)
 					{ 
-						fout << "Добавляем число " << temp2 * temp1 << " в стак" << endl
-							<< "Стак: "; stackShow(&stack, showMessage);
-						fout << endl;
+						fout << "Добавляем число " << temp2 * temp1 << " в стак" << endl;
+						stackShow(&stack, true);
 					}
 				}
 				else
@@ -1345,9 +1340,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 							stackPush(&stack, temp2 / temp1);
 							if (showMessage)
 							{ 
-							fout << "Добавляем число " << temp2 / temp1 << " в стак" << endl
-								<< "Стак: "; stackShow(&stack, showMessage);
-							fout << endl;
+							fout << "Добавляем число " << temp2 / temp1 << " в стак" << endl;
+							stackShow(&stack, true);
 							}
 						}
 						else
@@ -1358,9 +1352,8 @@ float calcTest(string ex, bool isRev, bool showMessage)
 							stackPush(&stack, temp1 / temp2);
 							if (showMessage) 
 							{
-								fout << "Добавляем число " << temp1 / temp2 << " в стак" << endl
-								<< "Стак: "; stackShow(&stack, showMessage);
-								fout << endl;
+								fout << "Добавляем число " << temp1 / temp2 << " в стак" << endl;
+								stackShow(&stack, true);
 							}
 						}
 					}
@@ -1393,6 +1386,7 @@ float calcTest(string ex, bool isRev, bool showMessage)
 		system("pause");
 		return 0;
 	}
+	fout.close();
 }
 
 int parse(string s)
@@ -1441,10 +1435,12 @@ void stackCopy(Stack<T>* stack, Stack<T>* copy)
 	} while (ptr != nullptr);
 }
 
-template <typename T>
+template<typename T>
 void stackShow(Stack<T>* stack, bool showMessage)
 {
 	ofstream fout;
+	fout.open(answerFile, ios::app);
+	fout << "Стак: ";
 	Node<T>* ptr = stack->head;
 	do
 	{
@@ -1452,6 +1448,8 @@ void stackShow(Stack<T>* stack, bool showMessage)
 		if (showMessage) fout << ptr->data << " ";
 		ptr = ptr->next;
 	} while (ptr != nullptr);
+	if (showMessage) fout << endl;
+	fout.close();
 	cout << endl;
 }
 
@@ -1558,6 +1556,8 @@ void genPN(bool isRev, int operands, int taskNo) {
 void genTest()
 {
 	ofstream fout;
+	ifstream fin;
+	string line;
 	int variants, pn, rpn, taskNo, operands = 0;
 
 	cout << "Введите количество вариантов:" << endl;
@@ -1610,7 +1610,42 @@ void genTest()
 		fout << endl;
 		fout.close();
 	}
-	
 	system(testFile);
+
+	fout.open(answerFile);
+	fout.close();
+
+	for (int i = 0; i < variants; i++)
+	{
+		fin.open(testFile);
+		getline(fin, line);
+		fout.open(answerFile, ios::app);
+		fout << line << endl;
+		fout.close();
+		for (int j = 0; j < pn; j++)
+		{
+			getline(fin, line);
+			line = line.substr(3);
+			calcTest(line, false, true);
+			fout.open(answerFile, ios::app);
+			fout << endl;
+			fout.close();
+		}
+		for (int j = 0; j < rpn; j++)
+		{
+			getline(fin, line);
+			line = line.substr(3);
+			calcTest(line, true, true);
+			fout.open(answerFile, ios::app);
+			fout << endl;
+			fout.close();
+		}
+		fout.open(answerFile, ios::app);
+		fout << endl
+			<< "_______________________________________" << endl;
+		fout.close();
+		fin.close();
+	}
+	system(answerFile);
 }
 

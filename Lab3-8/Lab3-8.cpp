@@ -1,6 +1,4 @@
-﻿//TODO: Проверочная работа
-
-// Пользовательское соглашение.
+﻿// Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
 //1 все бинарные операторы, скобки и операнды разделять пробелами (пример: ( 2 + 2 ) * 2 )
 //2 вводить унарный минус слитно (пример: 2 * ( -1 ); 2 -1 * )
@@ -13,6 +11,7 @@
 #include <ctime>
 #include <chrono>
 #include <vector>
+#include <Windows.h>
 
 using namespace std;
 
@@ -93,6 +92,11 @@ void genTest();
 
 int main()
 {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO structCursorInfo;
+	GetConsoleCursorInfo(h, &structCursorInfo);
+	structCursorInfo.bVisible = FALSE;
+	SetConsoleCursorInfo(h, &structCursorInfo);
 	setlocale(LC_ALL, "russian");
 	srand(time(NULL));
 	cout.setf(ios::fixed);

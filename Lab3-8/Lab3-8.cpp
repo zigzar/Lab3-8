@@ -1444,13 +1444,13 @@ void stackShow(Stack<T>* stack, bool showMessage)
 	Node<T>* ptr = stack->head;
 	do
 	{
-		cout << ptr->data << " ";
 		if (showMessage) fout << ptr->data << " ";
+		else cout << ptr->data << " ";
 		ptr = ptr->next;
 	} while (ptr != nullptr);
 	if (showMessage) fout << endl;
+	else cout << endl;
 	fout.close();
-	cout << endl;
 }
 
 void task()

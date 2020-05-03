@@ -1372,7 +1372,7 @@ float calcTest(string ex, bool isRev, bool showMessage)
 				throw "Неопознанный аргумент!";
 			}
 		}
-		return stack.head->data;
+		fout << "Ответ: " << stack.head->data << endl;
 	}
 	catch (const char* exception)
 	{
@@ -1615,16 +1615,19 @@ void genTest()
 	fout.open(answerFile);
 	fout.close();
 
-	for (int i = 0; i < variants; i++)
+	fin.open(testFile);
+	for (int i = 1; i <= variants; i++)
 	{
-		fin.open(testFile);
 		getline(fin, line);
 		fout.open(answerFile, ios::app);
-		fout << line << endl;
+		fout << "Вариант " << i << endl;
 		fout.close();
 		for (int j = 0; j < pn; j++)
 		{
 			getline(fin, line);
+			fout.open(answerFile, ios::app);
+			fout << line << endl;
+			fout.close();
 			line = line.substr(3);
 			calcTest(line, false, true);
 			fout.open(answerFile, ios::app);
@@ -1634,18 +1637,22 @@ void genTest()
 		for (int j = 0; j < rpn; j++)
 		{
 			getline(fin, line);
+			fout.open(answerFile, ios::app);
+			fout << line << endl;
+			fout.close();
 			line = line.substr(3);
 			calcTest(line, true, true);
 			fout.open(answerFile, ios::app);
 			fout << endl;
 			fout.close();
 		}
+		getline(fin, line);			// Пропустить отступ между вариантами
 		fout.open(answerFile, ios::app);
 		fout << endl
 			<< "_______________________________________" << endl;
 		fout.close();
-		fin.close();
 	}
+	fin.close();
 	system(answerFile);
 }
 

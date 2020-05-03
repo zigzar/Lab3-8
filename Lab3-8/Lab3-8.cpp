@@ -88,7 +88,8 @@ void infixToPNVec(string& ex, bool isRev);
 void PNToInfixVec(string& ex, bool isRev);
 
 void task();
-//void genPN();
+void genPN(bool isRev);
+void genTest();
 
 int main()
 {
@@ -671,7 +672,7 @@ void menu()
 			transMenu();
 			break;		
 		case 2:
-			//genTest();
+			genTest();
 			break;
 		case 3:
 			task();
@@ -1465,57 +1466,55 @@ void task()
 
 }
 
-//void genPN() {
-//	int quantity;
-//	int q_operands, q_operations, cout_operands;
-//	ofstream fout;
-//	//ofstream file(testFile);
-//	string ex = "";
-//	for (int variant = 1; variant <= quantity; variant++) 
-//	{
-//		fout.open(testFile);
-//		fout << "Вариант " << variant << endl
-//			<< "Вычислить:" << endl;
-//
-//		cout_operands = q_operands = 5 + rand() % 4;//рандомное количество операндов в выражении 1, чем больше здесь, тем меньше будет в выражении 2
-//		q_operations = q_operands - 1;
-//		for (int i = 0; i < 50; i++)
-//			ex[i] = '\0';
-//		char* ex_ptr = ex;
-//		for (ex_ptr; q_operands or q_operations; 1) {//обратная польская
-//			if (rand() % 2) {//вероятность добавить операнд - 50%, операцию - 50%, если выполнятся проверки
-//				if (q_operands) {//если еще остались свободные операнды
-//					c = int_to_char(rand() % 15 + 1);//выбор значения операнда
-//					strcat(ex_ptr, c);
-//					delete[] c;
-//					while (*ex_ptr != '\0')
-//						ex_ptr++;
-//					*ex_ptr = ' ';
-//					q_operands--;
-//					ex_ptr++;
-//				}
-//			}
-//			else {
-//				if (q_operands < q_operations) {		//сели количество операндов меньше количества операций
-//					*ex_ptr = rand() % 3 + 1;	//соответственно, первые два символа выражения будут операнды (считая операнды больше 9 в скобках за один),
-//														//а последний будет операцией
-//					switch (*ex_ptr) {
-//					case 1:
-//						*ex_ptr = '+';
-//						break;
-//					case 2:
-//						*ex_ptr = '*';
-//						break;
-//					case 3:
-//						*ex_ptr = '-';
-//						break;
-//					}
-//					q_operations--;
-//					ex_ptr++;
-//				}
-//			}
-//		}
-//		file.write(ex, strlen(ex));//запись строки в файл
-//
-//		
-//}
+void genPN(bool isRev, int operands) {
+	int quantity = 10;
+	int operations, outputOperands;
+	string operand, op;
+	ofstream fout;
+	ofstream file(testFile);
+	fout.open(testFile);
+	string ex = "";
+	operands += rand() % 4;
+	outputOperands = operands;
+	operations = operands - 1;
+
+	while (operands || operations) {			// Пока есть операнды и операторы
+		if (rand() % 2) {
+			if (operands) {
+				operand = to_string(rand() % 13 + 1);
+				ex += operand;
+				ex += " ";
+				operands--;
+			}
+		}
+		else {
+			if (operands < operations) {
+				switch (rand() % 3) {
+				case 0:
+					op = '+';
+					break;
+				case 1:
+					op = '*';
+					break;
+				case 2:
+					op = '-';
+					break;
+				}
+				operations--;
+				ex += op;
+				ex += " ";
+			}
+		}
+	}
+
+	if (!isRev) reverse(ex.begin(), ex.end());
+	fout << ex << endl;
+	fout.close();
+}
+
+void genTest()
+{
+
+	genPN(true, 5);
+}
+

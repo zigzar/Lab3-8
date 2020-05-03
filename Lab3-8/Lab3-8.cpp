@@ -1,4 +1,4 @@
-﻿//TODO: Проверочная работа, посчитать скорость
+﻿//TODO: Проверочная работа
 
 // Пользовательское соглашение.
 //Выбирая "принять", вы обязуетесь соблюдать следующие условия использования программы:
@@ -27,6 +27,8 @@ using namespace std;
 #define UNK -2													// Неопознанное значение
 
 #define inpFile "input.txt"										// Файл ввода
+#define testFile "test.txt"										// Файл теста
+#define answerFile "answer.txt"									// Файл ответов
 
 template<typename T>
 struct Node														// Узел стака
@@ -70,8 +72,12 @@ template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
 template<typename T>
 T stackPop(Stack<T>* stack);								// Удалить элемент из стака
+template<typename T>
+void stackShow(Stack<T>* stack, bool showMessage);
+
 float calcInfix(string ex);
 float calcPN(string ex, bool isRev);
+float calcTest(string ex, bool isRev, bool showMessage);
 void infixToPN(string& ex, bool isRev);
 void PNToInfix(string& ex, bool isRev);
 int parse(string s);
@@ -82,6 +88,7 @@ void infixToPNVec(string& ex, bool isRev);
 void PNToInfixVec(string& ex, bool isRev);
 
 void task();
+//void genPN();
 
 int main()
 {
@@ -613,7 +620,7 @@ void calcMenu()
 		timerEnd = chrono::high_resolution_clock::now();
 		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		timerStart = chrono::high_resolution_clock::now();
-		result = calcInfixVec(ex);
+		calcInfixVec(ex);
 		timerEnd = chrono::high_resolution_clock::now();
 		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
@@ -623,7 +630,7 @@ void calcMenu()
 		timerEnd = chrono::high_resolution_clock::now();
 		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		timerStart = chrono::high_resolution_clock::now();
-		result = calcPNVec(ex, false);
+		calcPNVec(ex, false);
 		timerEnd = chrono::high_resolution_clock::now();
 		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
@@ -633,7 +640,7 @@ void calcMenu()
 		timerEnd = chrono::high_resolution_clock::now();
 		listTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		timerStart = chrono::high_resolution_clock::now();
-		result = calcPNVec(ex, true);
+		calcPNVec(ex, true);
 		timerEnd = chrono::high_resolution_clock::now();
 		arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 		break;
@@ -1079,12 +1086,12 @@ float calcPN(string ex, bool isRev)
 {
 	try
 	{
+		cout.unsetf(ios::fixed);
 		if (!isRev) reverse(ex.begin(), ex.end());
 		Stack<float> stack;
 		string token;
 		stringstream bufStream;
 		bufStream << ex;
-		cin.clear();
 		float temp = 0;
 		while (getline(bufStream, token, ' '))
 		{
@@ -1144,6 +1151,172 @@ float calcPN(string ex, bool isRev)
 						else
 						{
 							stackPush(&stack, stackPop(&stack) / stackPop(&stack));
+						}
+					}
+					catch (const std::exception&)
+					{
+						throw "Деление на ноль запрещено!";
+					}
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case UNK:
+				throw "Неопознанный аргумент!";
+			}
+		}
+		cout.setf(ios::fixed);
+		return stack.head->data;
+	}
+	catch (const char* exception)
+	{
+		cerr << exception << endl;
+		system("pause");
+		return 0;
+	}
+	catch (const std::exception&)
+	{
+		cerr << "Неверное выражение!" << endl;
+		system("pause");
+		return 0;
+	}
+}
+
+float calcTest(string ex, bool isRev, bool showMessage)
+{
+	ofstream fout;
+	try
+	{
+		if (!isRev)
+		{
+			reverse(ex.begin(), ex.end());
+			if (showMessage) fout << "Переворачиваем выражение: " << ex << endl;
+		}
+		Stack<float> stack;
+		string token;
+		stringstream bufStream;
+		bufStream << ex;
+		cin.clear();
+		float temp1 = 0;
+		float temp2 = 0;
+		while (getline(bufStream, token, ' '))
+		{
+			switch (parse(token)) { // Попытка распознать токен
+			case VAL:
+				stackPush(&stack, stof(token));
+				if (showMessage)
+				{
+					fout << "Добавляем число " << token << " в стак" << endl
+						<< "Стак: "; stackShow(&stack, showMessage);
+					fout << endl;
+				}
+				break;
+
+				// Вычисление
+			case ADD:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и складываем: " << temp2 << " + " << temp1 << " = " << temp2 + temp1 << endl;
+					stackPush(&stack, temp1 + temp2);
+					if (showMessage) {
+						fout << "Добавляем число " << temp2 + temp1 << " в стак" << endl
+							 << "Стак: "; stackShow(&stack, showMessage);
+						fout << endl;
+					}
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case SUB:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					if (isRev)
+					{
+						temp1 = stackPop(&stack);
+						temp2 = stackPop(&stack);
+						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и вычитаем: " << temp2 << " - " << temp1 << " = " << temp2 - temp1 << endl;
+						stackPush(&stack, temp2 - temp1);
+						if (showMessage)
+						{ 
+							fout << "Добавляем число " << temp2 - temp1 << " в стак" << endl
+								<< "Стак: "; stackShow(&stack, showMessage);
+							fout << endl;
+						}
+					}
+					else
+					{
+						temp1 = stackPop(&stack);
+						temp2 = stackPop(&stack);
+						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и вычитаем: " << temp1 << " - " << temp2 << " = " << temp1 - temp2 << endl;
+						stackPush(&stack, temp1 - temp2);
+						if (showMessage)
+						{ 
+							fout << "Добавляем число " << temp1 - temp2 << " в стак" << endl
+								<< "Стак: "; stackShow(&stack, showMessage);
+							fout << endl;
+						}
+					}
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case MUL:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					temp1 = stackPop(&stack);
+					temp2 = stackPop(&stack);
+					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и перемножаем: " << temp2 << " * " << temp1 << " = " << temp2 * temp1 << endl;
+					stackPush(&stack, temp2 * temp1);
+					if (showMessage)
+					{ 
+						fout << "Добавляем число " << temp2 * temp1 << " в стак" << endl
+							<< "Стак: "; stackShow(&stack, showMessage);
+						fout << endl;
+					}
+				}
+				else
+				{
+					throw "Недостаточно операндов!";
+				}
+				break;
+
+			case DIV:
+				if (stack.head != nullptr && stack.head->next != nullptr) {
+					try
+					{
+						if (isRev)
+						{
+							temp1 = stackPop(&stack);
+							temp2 = stackPop(&stack);
+							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и делим: " << temp2 << " / " << temp1 << " = " << temp2 / temp1 << endl;
+							stackPush(&stack, temp2 / temp1);
+							if (showMessage)
+							{ 
+							fout << "Добавляем число " << temp2 / temp1 << " в стак" << endl
+								<< "Стак: "; stackShow(&stack, showMessage);
+							fout << endl;
+							}
+						}
+						else
+						{
+							temp1 = stackPop(&stack);
+							temp2 = stackPop(&stack);
+							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и делим: " << temp1 << " / " << temp2 << " = " << temp1 / temp2 << endl;
+							stackPush(&stack, temp1 / temp2);
+							if (showMessage) 
+							{
+								fout << "Добавляем число " << temp1 / temp2 << " в стак" << endl
+								<< "Стак: "; stackShow(&stack, showMessage);
+								fout << endl;
+							}
 						}
 					}
 					catch (const std::exception&)
@@ -1224,12 +1397,14 @@ void stackCopy(Stack<T>* stack, Stack<T>* copy)
 }
 
 template <typename T>
-void stackShow(Stack<T>* stack)
+void stackShow(Stack<T>* stack, bool showMessage)
 {
+	ofstream fout;
 	Node<T>* ptr = stack->head;
 	do
 	{
 		cout << ptr->data << " ";
+		if (showMessage) fout << ptr->data << " ";
 		ptr = ptr->next;
 	} while (ptr != nullptr);
 	cout << endl;
@@ -1277,11 +1452,11 @@ void task()
 
 	cout.precision(0);
 	cout << "Общий стак:" << endl;
-	stackShow(&copy);
+	stackShow(&copy, false);
 	cout << "Стак положительных чисел:" << endl;
-	if (pos.head != nullptr) stackShow(&pos);		// Если стак не пустой, вывести числа
+	if (pos.head != nullptr) stackShow(&pos, false);		// Если стак не пустой, вывести числа
 	cout << "Стак отрицательных чисел:" << endl;
-	if (neg.head != nullptr) stackShow(&neg);		// Если стак не пустой, вывести числа
+	if (neg.head != nullptr) stackShow(&neg, false);		// Если стак не пустой, вывести числа
 	cout.precision(7);
 	cout << "Время выполнения списком: " << (listTime1 + listTime2) / 1000000000 << " c" << endl;
 	cout << "Время выполнения массивом: " << arrayTime / 1000000000 << " c" << endl;
@@ -1289,3 +1464,58 @@ void task()
 	system("pause");
 
 }
+
+//void genPN() {
+//	int quantity;
+//	int q_operands, q_operations, cout_operands;
+//	ofstream fout;
+//	//ofstream file(testFile);
+//	string ex = "";
+//	for (int variant = 1; variant <= quantity; variant++) 
+//	{
+//		fout.open(testFile);
+//		fout << "Вариант " << variant << endl
+//			<< "Вычислить:" << endl;
+//
+//		cout_operands = q_operands = 5 + rand() % 4;//рандомное количество операндов в выражении 1, чем больше здесь, тем меньше будет в выражении 2
+//		q_operations = q_operands - 1;
+//		for (int i = 0; i < 50; i++)
+//			ex[i] = '\0';
+//		char* ex_ptr = ex;
+//		for (ex_ptr; q_operands or q_operations; 1) {//обратная польская
+//			if (rand() % 2) {//вероятность добавить операнд - 50%, операцию - 50%, если выполнятся проверки
+//				if (q_operands) {//если еще остались свободные операнды
+//					c = int_to_char(rand() % 15 + 1);//выбор значения операнда
+//					strcat(ex_ptr, c);
+//					delete[] c;
+//					while (*ex_ptr != '\0')
+//						ex_ptr++;
+//					*ex_ptr = ' ';
+//					q_operands--;
+//					ex_ptr++;
+//				}
+//			}
+//			else {
+//				if (q_operands < q_operations) {		//сели количество операндов меньше количества операций
+//					*ex_ptr = rand() % 3 + 1;	//соответственно, первые два символа выражения будут операнды (считая операнды больше 9 в скобках за один),
+//														//а последний будет операцией
+//					switch (*ex_ptr) {
+//					case 1:
+//						*ex_ptr = '+';
+//						break;
+//					case 2:
+//						*ex_ptr = '*';
+//						break;
+//					case 3:
+//						*ex_ptr = '-';
+//						break;
+//					}
+//					q_operations--;
+//					ex_ptr++;
+//				}
+//			}
+//		}
+//		file.write(ex, strlen(ex));//запись строки в файл
+//
+//		
+//}

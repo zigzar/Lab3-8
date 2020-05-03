@@ -700,6 +700,50 @@ void agreement()
 	}
 }
 
+int getAnsTest()
+{
+	int choice = 0;
+	int options = 5;
+	int ch;
+	while (true) {
+		system("cls");
+		choice = (choice + options) % options;
+
+		cout << "Выберите уровень сложности теста" << endl << endl;
+
+		cout << "Вверх/w и " << "вниз/s для перемещения" << endl;
+		cout << "Enter для выбора" << endl << endl;
+
+		if (choice == 0) cout << "-> Легкий" << endl;
+		else  cout << "   Легкий" << endl;
+
+		if (choice == 1) cout << "-> Средний" << endl;
+		else  cout << "   Средний" << endl;
+
+		if (choice == 2) cout << "-> Тяжелый" << endl;
+		else  cout << "   Тяжелый" << endl;
+
+		if (choice == 3) cout << "-> ЛЭТИшник" << endl;
+		else  cout << "   ЛЭТИшник" << endl;
+
+		if (choice == 4) cout << "-> Назад" << endl;
+		else  cout << "   Назад" << endl;
+
+		ch = _getch();
+		if (ch == 224)
+		{
+			ch = _getch();
+			if (ch == 80) choice++;
+			if (ch == 72) choice--;
+		}
+		if (ch == 119) choice--;
+		if (ch == 115) choice++;
+		if (ch == 13) break;
+	}
+	system("cls");
+	return choice;
+}
+
 int getAnsRPN()
 {
 	int choice = 0;
@@ -1466,13 +1510,11 @@ void task()
 
 }
 
-void genPN(bool isRev, int operands) {
+void genPN(bool isRev, int operands, int taskNo) {
 	int quantity = 10;
 	int operations, outputOperands;
 	string operand, op;
 	ofstream fout;
-	ofstream file(testFile);
-	fout.open(testFile);
 	string ex = "";
 	operands += rand() % 4;
 	outputOperands = operands;
@@ -1508,13 +1550,67 @@ void genPN(bool isRev, int operands) {
 	}
 
 	if (!isRev) reverse(ex.begin(), ex.end());
-	fout << ex << endl;
+	fout.open(testFile, ios_base::app);
+	fout << taskNo << ") " << ex << endl;
 	fout.close();
 }
 
 void genTest()
 {
+	ofstream fout;
+	int variants, pn, rpn, taskNo, operands = 0;
 
-	genPN(true, 5);
+	cout << "Введите количество вариантов:" << endl;
+	cin >> variants;
+	cout << "Введите количество задач с ППЗ:" << endl;
+	cin >> pn;
+	cout << "Введите количество задач с ОПЗ:" << endl;
+	cin >> rpn;
+
+	int answer = getAnsTest();
+	switch (answer)
+	{
+	case 0:
+		operands = 2;
+		break;
+	case 1:
+		operands = 4;
+		break;
+	case 2:
+		operands = 6;
+		break;
+	case 3:
+		operands = 10;
+		break;
+	case 4:
+		return;
+		break;
+	}
+
+	fout.open(testFile);
+	fout.close();
+
+	for (int i = 1; i <= variants; i++)
+	{
+		fout.open(testFile, ios_base::app);
+		fout << "Вариант " << i << endl;
+		fout.close();
+		taskNo = 1;
+		for (int j = 0; j < pn; j++)
+		{
+			genPN(false, operands, taskNo);
+			taskNo++;
+		}
+		for (int j = 0; j < rpn; j++)
+		{
+			genPN(true, operands, taskNo);
+			taskNo++;
+		}
+		fout.open(testFile, ios_base::app);
+		fout << endl;
+		fout.close();
+	}
+	
+	system(testFile);
 }
 

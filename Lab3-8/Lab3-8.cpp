@@ -30,16 +30,16 @@ using namespace std;
 #define answerFile "answer.txt"							// Файл ответов
 
 template<typename T>
-struct Node												// Узел стака
+struct Node												// Узел стека
 {
 	T data;												// Данные
 	Node* next;											// Адрес следующего узла
 };
 
 template<typename T>
-struct Stack											// Стак
+struct Stack											// стек
 {
-	Node<T>* head = nullptr;							// Первый элемент стака
+	Node<T>* head = nullptr;							// Первый элемент стека
 };
 
 double listTime;										// Время выполнения списком
@@ -71,15 +71,15 @@ void newFile();											// Создать новый файл, если нет
 void console(string& ex);								// Ввод в консоль
 void file(string& ex);									// Ввод из файла input.txt
 
-// ОПЕРАЦИИ СО СТАКОМ //
+// ОПЕРАЦИИ СО стекОМ //
 template<typename T, typename N>
-void stackPush(Stack<T>* stack, N data);				// Добавить элемент в стак
+void stackPush(Stack<T>* stack, N data);				// Добавить элемент в стек
 template<typename T>
-T stackPop(Stack<T>* stack);							// Удалить элемент из стака
+T stackPop(Stack<T>* stack);							// Удалить элемент из стека
 template<typename T>
-void stackShow(Stack<T>* stack, bool showMessage);		// Вывести стак в консоль/файл
+void stackShow(Stack<T>* stack, bool showMessage);		// Вывести стек в консоль/файл
 template<typename T>
-void stackCopy(Stack<T>* stack, Stack<T>* copy);		// Сделать копию стака
+void stackCopy(Stack<T>* stack, Stack<T>* copy);		// Сделать копию стека
 
 // ВЫЧИСЛЕНИЕ СПИСКОМ //
 float calcInfix(string ex);								// Вычислить инфиксное выражение
@@ -1270,7 +1270,7 @@ float calcTest(string ex, bool isRev, bool showMessage)
 				stackPush(&stack, stof(token));
 				if (showMessage)
 				{
-					fout << "Добавляем число " << token << " в стак" << endl;
+					fout << "Добавляем число " << token << " в стек" << endl;
 					stackShow(&stack, true);
 				}
 				break;
@@ -1280,10 +1280,10 @@ float calcTest(string ex, bool isRev, bool showMessage)
 				if (stack.head != nullptr && stack.head->next != nullptr) {
 					temp1 = stackPop(&stack);
 					temp2 = stackPop(&stack);
-					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и складываем: " << temp2 << " + " << temp1 << " = " << temp2 + temp1 << endl;
+					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и складываем: " << temp2 << " + " << temp1 << " = " << temp2 + temp1 << endl;
 					stackPush(&stack, temp1 + temp2);
 					if (showMessage) {
-						fout << "Добавляем число " << temp2 + temp1 << " в стак" << endl;
+						fout << "Добавляем число " << temp2 + temp1 << " в стек" << endl;
 						stackShow(&stack, true);
 					}
 				}
@@ -1299,11 +1299,11 @@ float calcTest(string ex, bool isRev, bool showMessage)
 					{
 						temp1 = stackPop(&stack);
 						temp2 = stackPop(&stack);
-						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и вычитаем: " << temp2 << " - " << temp1 << " = " << temp2 - temp1 << endl;
+						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и вычитаем: " << temp2 << " - " << temp1 << " = " << temp2 - temp1 << endl;
 						stackPush(&stack, temp2 - temp1);
 						if (showMessage)
 						{ 
-							fout << "Добавляем число " << temp2 - temp1 << " в стак" << endl;
+							fout << "Добавляем число " << temp2 - temp1 << " в стек" << endl;
 							stackShow(&stack, true);
 						}
 					}
@@ -1311,11 +1311,11 @@ float calcTest(string ex, bool isRev, bool showMessage)
 					{
 						temp1 = stackPop(&stack);
 						temp2 = stackPop(&stack);
-						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и вычитаем: " << temp1 << " - " << temp2 << " = " << temp1 - temp2 << endl;
+						if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и вычитаем: " << temp1 << " - " << temp2 << " = " << temp1 - temp2 << endl;
 						stackPush(&stack, temp1 - temp2);
 						if (showMessage)
 						{ 
-							fout << "Добавляем число " << temp1 - temp2 << " в стак" << endl;
+							fout << "Добавляем число " << temp1 - temp2 << " в стек" << endl;
 							stackShow(&stack, true);
 						}
 					}
@@ -1330,11 +1330,11 @@ float calcTest(string ex, bool isRev, bool showMessage)
 				if (stack.head != nullptr && stack.head->next != nullptr) {
 					temp1 = stackPop(&stack);
 					temp2 = stackPop(&stack);
-					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и перемножаем: " << temp2 << " * " << temp1 << " = " << temp2 * temp1 << endl;
+					if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и перемножаем: " << temp2 << " * " << temp1 << " = " << temp2 * temp1 << endl;
 					stackPush(&stack, temp2 * temp1);
 					if (showMessage)
 					{ 
-						fout << "Добавляем число " << temp2 * temp1 << " в стак" << endl;
+						fout << "Добавляем число " << temp2 * temp1 << " в стек" << endl;
 						stackShow(&stack, true);
 					}
 				}
@@ -1352,11 +1352,11 @@ float calcTest(string ex, bool isRev, bool showMessage)
 						{
 							temp1 = stackPop(&stack);
 							temp2 = stackPop(&stack);
-							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и делим: " << temp2 << " / " << temp1 << " = " << temp2 / temp1 << endl;
+							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и делим: " << temp2 << " / " << temp1 << " = " << temp2 / temp1 << endl;
 							stackPush(&stack, temp2 / temp1);
 							if (showMessage)
 							{ 
-							fout << "Добавляем число " << temp2 / temp1 << " в стак" << endl;
+							fout << "Добавляем число " << temp2 / temp1 << " в стек" << endl;
 							stackShow(&stack, true);
 							}
 						}
@@ -1364,11 +1364,11 @@ float calcTest(string ex, bool isRev, bool showMessage)
 						{
 							temp1 = stackPop(&stack);
 							temp2 = stackPop(&stack);
-							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стака и делим: " << temp1 << " / " << temp2 << " = " << temp1 / temp2 << endl;
+							if (showMessage) fout << "Берём числа " << temp1 << " и " << temp2 << " из стека и делим: " << temp1 << " / " << temp2 << " = " << temp1 / temp2 << endl;
 							stackPush(&stack, temp1 / temp2);
 							if (showMessage) 
 							{
-								fout << "Добавляем число " << temp1 / temp2 << " в стак" << endl;
+								fout << "Добавляем число " << temp1 / temp2 << " в стек" << endl;
 								stackShow(&stack, true);
 							}
 						}
@@ -1407,7 +1407,7 @@ float calcTest(string ex, bool isRev, bool showMessage)
 
 int parse(string s)
 {
-	float tval;																// Временное значение того же типа, что и стак
+	float tval;																// Временное значение того же типа, что и стек
 																		// Распознавание знаков арифметических операций
 	if (s[s.length() - 1] == '-') {										// Если последний символ строки - минус (проверка на бинарный минус)
 			return(SUB);
@@ -1456,7 +1456,7 @@ void stackShow(Stack<T>* stack, bool showMessage)
 {
 	ofstream fout;
 	fout.open(answerFile, ios::app);
-	fout << "Стак: ";
+	fout << "стек: ";
 	Node<T>* ptr = stack->head;
 	do
 	{
@@ -1472,8 +1472,8 @@ void stackShow(Stack<T>* stack, bool showMessage)
 void task()
 {
 	cout << "Вариант №4." << endl
-		<< "Реализуйте стак. Заполните его случайными положительными и отрицательными числами." << endl
-		<< "Преобразуйте стак в два стака. Первый должен содержать только положительные числа, второй – отрицательные." << endl << endl;
+		<< "Реализуйте стек. Заполните его случайными положительными и отрицательными числами." << endl
+		<< "Преобразуйте стек в два стека. Первый должен содержать только положительные числа, второй – отрицательные." << endl << endl;
 
 	timerStart = chrono::high_resolution_clock::now();
 	Stack<float> general, pos, neg, copy;
@@ -1483,7 +1483,7 @@ void task()
 	}
 	timerEnd = chrono::high_resolution_clock::now();
 	double listTime1 = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
-	stackCopy(&general, &copy);			// Сделать копию стака для вывода в консоль
+	stackCopy(&general, &copy);			// Сделать копию стека для вывода в консоль
 	timerStart = chrono::high_resolution_clock::now();
 	for (int i = 0; i < 10; i++)
 	{
@@ -1510,12 +1510,12 @@ void task()
 	arrayTime = chrono::duration_cast<chrono::nanoseconds>(timerEnd - timerStart).count();
 
 	cout.precision(0);
-	cout << "Общий стак:" << endl;
+	cout << "Общий стек:" << endl;
 	stackShow(&copy, false);
-	cout << "Стак положительных чисел:" << endl;
-	if (pos.head != nullptr) stackShow(&pos, false);		// Если стак не пустой, вывести числа
-	cout << "Стак отрицательных чисел:" << endl;
-	if (neg.head != nullptr) stackShow(&neg, false);		// Если стак не пустой, вывести числа
+	cout << "стек положительных чисел:" << endl;
+	if (pos.head != nullptr) stackShow(&pos, false);		// Если стек не пустой, вывести числа
+	cout << "стек отрицательных чисел:" << endl;
+	if (neg.head != nullptr) stackShow(&neg, false);		// Если стек не пустой, вывести числа
 	cout.precision(7);
 	cout << "Время выполнения списком: " << (listTime1 + listTime2) / 1000000000 << " c" << endl;
 	cout << "Время выполнения массивом: " << arrayTime / 1000000000 << " c" << endl;

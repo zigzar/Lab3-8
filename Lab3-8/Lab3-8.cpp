@@ -71,7 +71,7 @@ void newFile();											// Создать новый файл, если нет
 void console(string& ex);								// Ввод в консоль
 void file(string& ex);									// Ввод из файла input.txt
 
-// ОПЕРАЦИИ СО стекОМ //
+// ОПЕРАЦИИ СО СТЕКОМ //
 template<typename T, typename N>
 void stackPush(Stack<T>* stack, N data);				// Добавить элемент в стек
 template<typename T>

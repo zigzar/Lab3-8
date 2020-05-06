@@ -15,80 +15,92 @@
 
 using namespace std;
 
-#define VAL  0													// В стек занесено новое значение
-#define ADD  11													// Сложение (первая цифра отвечает за приоритет, а вторая - за номер операции)
-#define SUB  12													// Вычитание (первая цифра отвечает за приоритет, а вторая - за номер операции)
-#define MUL  23													// Умножение (первая цифра отвечает за приоритет, а вторая - за номер операции)
-#define DIV  24													// Деление (первая цифра отвечает за приоритет, а вторая - за номер операции)
-#define BRO 5													// Открывающая скобка
-#define BRC 6													// Закрывающая скобка
-#define SUF -1													// В стеке недостаточно операндов
-#define UNK -2													// Неопознанное значение
+#define VAL  0											// В стек занесено новое значение
+#define ADD  11											// Сложение (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define SUB  12											// Вычитание (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define MUL  23											// Умножение (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define DIV  24											// Деление (первая цифра отвечает за приоритет, а вторая - за номер операции)
+#define BRO 5											// Открывающая скобка
+#define BRC 6											// Закрывающая скобка
+#define SUF -1											// В стеке недостаточно операндов
+#define UNK -2											// Неопознанное значение
 
-#define inpFile "input.txt"										// Файл ввода
-#define testFile "test.txt"										// Файл теста
-#define answerFile "answer.txt"									// Файл ответов
+#define inpFile "input.txt"								// Файл ввода
+#define testFile "test.txt"								// Файл теста
+#define answerFile "answer.txt"							// Файл ответов
 
 template<typename T>
-struct Node														// Узел стака
+struct Node												// Узел стака
 {
-	T data;														// Данные
-	Node* next;													// Адрес следующего узла
+	T data;												// Данные
+	Node* next;											// Адрес следующего узла
 };
 
 template<typename T>
-struct Stack													// Стак
+struct Stack											// Стак
 {
-	Node<T>* head = nullptr;									// Первый элемент стака
+	Node<T>* head = nullptr;							// Первый элемент стака
 };
 
-double listTime;
-double arrayTime;
-chrono::time_point<chrono::high_resolution_clock> timerStart, timerEnd;
+double listTime;										// Время выполнения списком
+double arrayTime;										// Время выполнения массивом
+chrono::time_point<chrono::high_resolution_clock> timerStart, timerEnd; // Таймер
 
-bool RPNMenu(string& ex);
-bool PNMenu(string& ex);
-bool infixMenu(string& ex);
-void transMenu();
-bool inpMenu(string& ex);
-void calcMenu();
-void menu();
-void agreement();
+// МЕНЮ. ЛОГИЧЕСКАЯ ЧАСТЬ //
+bool RPNMenu(string& ex);								// Меню перевода из ОПЗ
+bool PNMenu(string& ex);								// Меню перевода из ППЗ
+bool infixMenu(string& ex);								// Меню перевода из инфиксной записи
+void transMenu();										// Меню выбора записи для перевода
+bool inpMenu(string& ex);								// Меню ввода
+void calcMenu();										// Меню вычисления
+void menu();											// Главное меню
+void agreement();										// Меню польз. соглашения
 
-int getAnsInp();
-int getAnsRPN();
-int getAnsPN();
-int getAnsInf();
-int getAnsNot();
-int getAnsMenu();
-int getAnsAgreement();
+// МЕНЮ. ГРАФИЧЕСКАЯ ЧАСТЬ //
+int getAnsTest();										// Выбрать пункт в меню сложности теста
+int getAnsInp();										// Выбрать пункт в меню ввода
+int getAnsRPN();										// Выбрать пункт в меню перевода из ОПЗ
+int getAnsPN();											// Выбрать пункт в меню перевода из ППЗ
+int getAnsInf();										// Выбрать пункт в меню перевода из инфиксной записи
+int getAnsNot();										// Выбрать нотацию введенного выражения
+int getAnsMenu();										// Выбрать пункт в главном меню
+int getAnsAgreement();									// Выбрать пункт в меню польз. соглашения
 
-void newFile();
-void console(string& ex);
-void file(string& ex);
+// ВВОД //
+void newFile();											// Создать новый файл, если нет input.txt
+void console(string& ex);								// Ввод в консоль
+void file(string& ex);									// Ввод из файла input.txt
 
+// ОПЕРАЦИИ СО СТАКОМ //
 template<typename T, typename N>
-void stackPush(Stack<T>* stack, N data);					// Добавить элемент в стак
+void stackPush(Stack<T>* stack, N data);				// Добавить элемент в стак
 template<typename T>
-T stackPop(Stack<T>* stack);								// Удалить элемент из стака
+T stackPop(Stack<T>* stack);							// Удалить элемент из стака
 template<typename T>
-void stackShow(Stack<T>* stack, bool showMessage);
+void stackShow(Stack<T>* stack, bool showMessage);		// Вывести стак в консоль/файл
+template<typename T>
+void stackCopy(Stack<T>* stack, Stack<T>* copy);		// Сделать копию стака
 
-float calcInfix(string ex);
-float calcPN(string ex, bool isRev);
-float calcTest(string ex, bool isRev, bool showMessage);
-void infixToPN(string& ex, bool isRev);
-void PNToInfix(string& ex, bool isRev);
-int parse(string s);
+// ВЫЧИСЛЕНИЕ СПИСКОМ //
+float calcInfix(string ex);								// Вычислить инфиксное выражение
+float calcPN(string ex, bool isRev);					// Вычислить выражение в ПЗ
+float calcTest(string ex, bool isRev, bool showMessage);// Вычислить с комментариями задание теста
+void infixToPN(string& ex, bool isRev);					// Перевод из инфиксной записи в польскую
+void PNToInfix(string& ex, bool isRev);					// Перевод из польской записи в инфиксную
+int parse(string s);									// Распознать токен
 
-float calcInfixVec(string ex);
-float calcPNVec(string ex, bool isRev);
-void infixToPNVec(string& ex, bool isRev);
-void PNToInfixVec(string& ex, bool isRev);
+// ВЫЧИСЛЕНИЕ МАССИВОМ //
+float calcInfixVec(string ex);							// Вычислить инфиксное выражение
+float calcPNVec(string ex, bool isRev);					// Вычислить выражение в ПЗ
+void infixToPNVec(string& ex, bool isRev);				// Перевод из инфиксной записи в польскую
+void PNToInfixVec(string& ex, bool isRev);				// Перевод из польской записи в инфиксную
 
-void task();
-void genPN(bool isRev);
-void genTest();
+// ЗАДАНИЕ ПО ВАРИАНТУ //
+void task();											// Реализуйте стек. Заполните его случайными положительными и отрицательными числами. Преобразуйте стек в два стека. Первый должен содержать только положительные числа, второй – отрицательные.
+
+// ПРОВЕРОЧНАЯ РАБОТА //
+void genPN(bool isRev, int operands, int taskNo);		// Генерация выражения в польской записи
+void genTest();											// Генерация теста и ответов
 
 int main()
 {
